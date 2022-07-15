@@ -1,15 +1,17 @@
-use std::any::TypeId;
+use crate::services::persistence::event_store::EventStore;
 
-use super::{event::Event, handler::MessageHandler, message::Message};
+use super::{handler::MessageHandler, message::Message};
 
 #[derive(Clone)]
 pub struct MessageBus<'a> {
     handlers: Vec<&'a dyn MessageHandler>,
+    event_store: &'a EventStore,
 }
 
 impl<'a> MessageBus<'a> {
-    pub fn new() -> MessageBus<'a> {
+    pub fn new(event_store: &'a EventStore) -> MessageBus<'a> {
         MessageBus {
+            event_store,
             handlers: Vec::new(),
         }
     }
@@ -18,12 +20,16 @@ impl<'a> MessageBus<'a> {
         self.handlers.push(handler);
     }
 
-    pub fn raise_event(event: Event) {}
+    pub async fn raise_event(&self, event: Box<dyn Message>) {
+        // self.event_store.write_event(*event).await;
 
-    pub fn send(&self, message: &dyn Message) {
+        self.send(event)
+    }
+
+    pub fn send(&self, message: Box<dyn Message>) {
         for handler in &self.handlers {
             if handler.message_type() == message.message_type() {
-                handler.handle(message);
+                handler.handle(&*message);
             }
         }
     }

@@ -13,7 +13,7 @@ use crate::application::event::{
     added_to_cart_event::AddedToCartEvent, added_to_cart_handler::AddedToCartEventHandler,
     created_cart_handler::CreatedCartEventHandler,
 };
-use crate::services::message_bus::bus::MessageBus;
+use crate::services::{message_bus::bus::MessageBus, persistence::event_store::EventStore};
 
 mod api;
 mod application;
@@ -24,7 +24,9 @@ mod services;
 async fn main() {
     dotenv().ok();
 
-    let mut bus = MessageBus::new();
+    let event_store = EventStore::new();
+
+    let mut bus = MessageBus::new(&event_store);
 
     let added_to_cart_handler = AddedToCartEventHandler::new();
     let created_card_handler = CreatedCartEventHandler::new();
@@ -33,7 +35,7 @@ async fn main() {
     bus.register_handler(&created_card_handler);
 
     let test_message = AddedToCartEvent::new(Uuid::new_v4(), Uuid::new_v4(), Uuid::new_v4(), 0);
-    bus.send(&test_message);
+    bus.send(Box::new(test_message));
 
     let app = Router::new()
         .route("/", get(test))
