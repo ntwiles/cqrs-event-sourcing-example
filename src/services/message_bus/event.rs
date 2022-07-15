@@ -1,5 +1,3 @@
-use std::fmt;
-
 use chrono::{offset::Utc, DateTime};
 use serde::Serialize;
 use uuid::Uuid;
