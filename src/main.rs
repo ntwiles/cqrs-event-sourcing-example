@@ -6,7 +6,6 @@ use axum::{
 use dotenv::dotenv;
 use uuid::Uuid;
 
-use std::any::TypeId;
 use std::net::SocketAddr;
 
 use crate::api::cart_controller;

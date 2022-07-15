@@ -20,7 +20,6 @@ impl fmt::Display for EventType {
     }
 }
 
-// TODO: Consider moving this to ./services/
 #[derive(Debug, Serialize)]
 pub struct Event {
     id: Uuid,
