@@ -20,9 +20,9 @@ impl<'a> MessageBus<'a> {
 
     pub fn raise_event(event: Event) {}
 
-    pub fn send(&self, type_id: TypeId, message: &dyn Message) {
+    pub fn send(&self, message: &dyn Message) {
         for handler in &self.handlers {
-            if handler.message_type() == type_id {
+            if handler.message_type() == message.message_type() {
                 handler.handle(message);
             }
         }

@@ -20,12 +20,6 @@ impl fmt::Display for EventType {
     }
 }
 
-// impl PartialEq for EventType {
-//     fn eq(&self, other: &EventType) -> bool {
-//         self.to_string() == other.to_string()
-//     }
-// }
-
 // TODO: Consider moving this to ./services/
 #[derive(Debug, Serialize)]
 pub struct Event {

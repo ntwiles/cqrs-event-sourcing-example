@@ -1,5 +1,15 @@
-pub struct Command {}
+use std::any::TypeId;
 
-impl Message for Command {}
+pub struct Command {
+    message_type: TypeId,
+}
 
-pub trait Message {}
+impl Message for Command {
+    fn message_type(&self) -> TypeId {
+        self.message_type
+    }
+}
+
+pub trait Message {
+    fn message_type(&self) -> TypeId;
+}

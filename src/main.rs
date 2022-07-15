@@ -1,7 +1,7 @@
 use axum::{
     response::IntoResponse,
     routing::{get, post},
-    Extension, Router,
+    Router,
 };
 use dotenv::dotenv;
 use uuid::Uuid;
@@ -12,7 +12,7 @@ use std::net::SocketAddr;
 use crate::api::cart_controller;
 use crate::application::event::{
     added_to_cart_event::AddedToCartEvent, added_to_cart_handler::AddedToCartEventHandler,
-    created_cart_event::CreatedCartEvent, created_cart_handler::CreatedCartEventHandler,
+    created_cart_handler::CreatedCartEventHandler,
 };
 use crate::services::message_bus::bus::MessageBus;
 
@@ -34,7 +34,7 @@ async fn main() {
     bus.register_handler(&created_card_handler);
 
     let test_message = AddedToCartEvent::new(Uuid::new_v4(), Uuid::new_v4(), Uuid::new_v4(), 0);
-    bus.send(TypeId::of::<AddedToCartEvent>(), &test_message);
+    bus.send(&test_message);
 
     let app = Router::new()
         .route("/", get(test))

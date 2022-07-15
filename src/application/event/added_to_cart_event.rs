@@ -1,6 +1,8 @@
 use serde::Serialize;
 use uuid::Uuid;
 
+use std::any::TypeId;
+
 use crate::services::message_bus::message::Message;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Serialize)]
@@ -27,4 +29,8 @@ impl AddedToCartEvent {
     }
 }
 
-impl Message for AddedToCartEvent {}
+impl Message for AddedToCartEvent {
+    fn message_type(&self) -> TypeId {
+        TypeId::of::<AddedToCartEvent>()
+    }
+}
