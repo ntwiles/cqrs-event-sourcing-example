@@ -1,7 +1,7 @@
 use dotenv_codegen::dotenv;
 use mongodb::{options::ClientOptions, Client};
 
-use crate::application::event::Event;
+use crate::services::message_bus::event::Event;
 
 pub struct EventStore {}
 
