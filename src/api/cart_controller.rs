@@ -1,9 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse, Extension, Json};
 
-use std::{
-    any::TypeId,
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 
 use crate::application::command::{
     add_to_cart_command::AddToCartCommand, create_cart_command::CreateCartCommand,
