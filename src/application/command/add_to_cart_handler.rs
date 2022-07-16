@@ -4,7 +4,7 @@ use crate::services::message_bus::bus::MessageBus;
 use super::add_to_cart_command::AddToCartCommand;
 
 pub struct AddToCartCommandHandler<'a> {
-    message_bus: &'a MessageBus<'a>,
+    message_bus: &'a MessageBus,
 }
 
 impl<'a> AddToCartCommandHandler<'a> {
@@ -20,6 +20,6 @@ impl<'a> AddToCartCommandHandler<'a> {
             command.quantity().clone(),
         );
 
-        self.message_bus.raise_event(Box::new(event));
+        self.message_bus.raise_event(Box::new(event)).await;
     }
 }

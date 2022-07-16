@@ -4,7 +4,7 @@ use crate::services::message_bus::bus::MessageBus;
 use super::create_cart_command::CreateCartCommand;
 
 pub struct CreateCartCommandHandler<'a> {
-    message_bus: &'a MessageBus<'a>,
+    message_bus: &'a MessageBus,
 }
 
 impl<'a> CreateCartCommandHandler<'a> {
@@ -15,6 +15,6 @@ impl<'a> CreateCartCommandHandler<'a> {
     pub async fn handle(&self, command: CreateCartCommand) -> () {
         let event = CreatedCartEvent::new(command.customer_id().clone());
 
-        self.message_bus.raise_event(Box::new(event));
+        self.message_bus.raise_event(Box::new(event)).await;
     }
 }
