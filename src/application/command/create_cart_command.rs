@@ -5,7 +5,7 @@ use std::any::Any;
 
 use crate::services::message_bus::message::MessageData;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct CreateCartCommand {
     customer_id: Uuid,
 }

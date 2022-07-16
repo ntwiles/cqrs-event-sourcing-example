@@ -3,9 +3,9 @@ use uuid::Uuid;
 
 use std::any::Any;
 
-use crate::services::message_bus::message::MessageData;
+use crate::services::message_bus::{event::EventData, message::MessageData};
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize)]
 pub struct CreatedCartEvent {
     customer_id: Uuid,
 }
@@ -21,3 +21,5 @@ impl MessageData for CreatedCartEvent {
         self
     }
 }
+
+impl EventData for CreatedCartEvent {}

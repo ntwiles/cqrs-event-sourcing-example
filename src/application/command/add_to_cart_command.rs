@@ -1,11 +1,11 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use std::any::Any;
 
 use crate::services::message_bus::message::MessageData;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct AddToCartCommand {
     cart_id: Uuid,
     customer_id: Uuid,

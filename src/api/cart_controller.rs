@@ -13,7 +13,7 @@ pub async fn insert<'a>(
 ) -> impl IntoResponse {
     let command = CreateCartCommand::new(add_to_cart_command.customer_id().clone());
 
-    let message = Message::new::<CreateCartCommand>(command);
+    let message = Message::new_command::<CreateCartCommand>(command);
 
     messsage_queue.lock().unwrap().send(message);
 

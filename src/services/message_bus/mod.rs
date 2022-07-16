@@ -9,6 +9,8 @@ use std::{
     thread,
 };
 
+use crate::services::persistence::event_store::EventStore;
+
 use queue::MessageQueue;
 use registry::HandlerRegistry;
 

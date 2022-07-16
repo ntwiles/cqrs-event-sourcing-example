@@ -10,19 +10,22 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use crate::api::cart_controller;
-use crate::application::{
-    command::{
-        add_to_cart_handler::AddToCartCommandHandler, create_cart_handler::CreateCartCommandHandler,
+use crate::{
+    api::cart_controller,
+    application::{
+        command::{
+            add_to_cart_handler::AddToCartCommandHandler,
+            create_cart_handler::CreateCartCommandHandler,
+        },
+        event::{
+            added_to_cart_handler::AddedToCartEventHandler,
+            created_cart_handler::CreatedCartEventHandler,
+        },
     },
-    event::{
-        added_to_cart_handler::AddedToCartEventHandler,
-        created_cart_handler::CreatedCartEventHandler,
+    services::{
+        message_bus::{queue::MessageQueue, registry::HandlerRegistry, start_message_loop},
+        persistence::event_store::EventStore,
     },
-};
-use crate::services::{
-    message_bus::{queue::MessageQueue, registry::HandlerRegistry, start_message_loop},
-    persistence::event_store::EventStore,
 };
 
 mod api;
@@ -34,9 +37,9 @@ mod services;
 async fn main() {
     dotenv().ok();
 
-    let event_store = EventStore::new();
+    let event_store = Arc::new(EventStore::new());
 
-    let queue = Arc::new(Mutex::new(MessageQueue::new(&event_store)));
+    let queue = Arc::new(Mutex::new(MessageQueue::new(event_store.clone())));
     let mut registry = HandlerRegistry::new(&event_store);
 
     // Commands
