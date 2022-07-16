@@ -10,9 +10,14 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 
 use crate::api::cart_controller;
-use crate::application::event::{
-    added_to_cart_event::AddedToCartEvent, added_to_cart_handler::AddedToCartEventHandler,
-    created_cart_handler::CreatedCartEventHandler,
+use crate::application::{
+    command::{
+        create_cart_command::CreateCartCommand, create_cart_handler::CreateCartCommandHandler,
+    },
+    event::{
+        added_to_cart_handler::AddedToCartEventHandler,
+        created_cart_handler::CreatedCartEventHandler,
+    },
 };
 use crate::services::{message_bus::bus::MessageBus, persistence::event_store::EventStore};
 
@@ -20,8 +25,6 @@ mod api;
 mod application;
 mod domain;
 mod services;
-
-struct Foo {}
 
 #[tokio::main]
 async fn main() {
@@ -31,14 +34,13 @@ async fn main() {
 
     let mut bus = MessageBus::new(&event_store);
 
-    let added_to_cart_handler = AddedToCartEventHandler::new();
-    let created_card_handler = CreatedCartEventHandler::new();
+    bus.register_handler(Box::new(CreateCartCommandHandler::new()));
 
-    bus.register_handler(Box::new(added_to_cart_handler));
-    bus.register_handler(Box::new(created_card_handler));
+    bus.register_handler(Box::new(AddedToCartEventHandler::new()));
+    bus.register_handler(Box::new(CreatedCartEventHandler::new()));
 
-    let test_message = AddedToCartEvent::new(Uuid::new_v4(), Uuid::new_v4(), Uuid::new_v4(), 0);
-    bus.send(Box::new(test_message)).await;
+    let create_cart_message = CreateCartCommand::new(Uuid::new_v4());
+    bus.send(Box::new(create_cart_message)).await;
 
     let shared_bus = Arc::new(bus);
 
