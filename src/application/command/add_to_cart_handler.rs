@@ -10,7 +10,7 @@ use crate::services::message_bus::{
     handler::MessageHandler, message::Message, queue::MessageQueue,
 };
 
-use super::add_to_cart_command::{AddToCartCommand, AddToCartCommandData};
+use super::add_to_cart_command::AddToCartCommand;
 
 pub struct AddToCartCommandHandler {
     message_queue: Arc<Mutex<MessageQueue>>,
@@ -28,11 +28,11 @@ impl MessageHandler for AddToCartCommandHandler {
         TypeId::of::<AddToCartCommand>()
     }
 
-    fn handle(&self, message: &dyn Message) -> () {
+    fn handle(&self, message: &Message) -> () {
         let command = message
             .data()
             .as_any()
-            .downcast_ref::<AddToCartCommandData>()
+            .downcast_ref::<AddToCartCommand>()
             .unwrap();
 
         let event = AddedToCartEvent::new(
@@ -42,9 +42,8 @@ impl MessageHandler for AddToCartCommandHandler {
             command.quantity().clone(),
         );
 
-        self.message_queue
-            .lock()
-            .unwrap()
-            .raise_event(Box::new(event));
+        let message = Message::new::<AddedToCartEvent>(event);
+
+        self.message_queue.lock().unwrap().raise_event(message);
     }
 }

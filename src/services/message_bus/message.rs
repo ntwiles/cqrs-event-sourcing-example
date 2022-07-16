@@ -1,11 +1,26 @@
 use std::any::{Any, TypeId};
 
-pub trait MessageData {
+pub trait MessageData: Send + Sync {
     fn as_any(&self) -> &dyn Any;
 }
 
-// TODO: Maybe this should be a struct instead of a trait since we've offloaded data.
-pub trait Message: Send + Sync {
-    fn code(&self) -> TypeId;
-    fn data(&self) -> &dyn MessageData;
+pub struct Message {
+    code: TypeId,
+    data: Box<dyn MessageData>,
+}
+
+impl Message {
+    pub fn new<T: 'static + MessageData>(data: T) -> Message {
+        Message {
+            code: TypeId::of::<T>(),
+            data: Box::new(data),
+        }
+    }
+    pub fn code(&self) -> TypeId {
+        self.code
+    }
+
+    pub fn data(&self) -> &Box<dyn MessageData> {
+        &self.data
+    }
 }

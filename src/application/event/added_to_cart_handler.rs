@@ -21,7 +21,7 @@ impl MessageHandler for AddedToCartEventHandler {
         TypeId::of::<AddedToCartEvent>()
     }
 
-    fn handle(&self, _message: &dyn Message) -> () {
+    fn handle(&self, _message: &Message) -> () {
         todo!()
     }
 }

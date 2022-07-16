@@ -1,19 +1,19 @@
 use serde::Deserialize;
 use uuid::Uuid;
 
-use std::any::{Any, TypeId};
+use std::any::Any;
 
-use crate::services::message_bus::message::{Message, MessageData};
+use crate::services::message_bus::message::MessageData;
 
 #[derive(Deserialize)]
-pub struct AddToCartCommandData {
+pub struct AddToCartCommand {
     cart_id: Uuid,
     customer_id: Uuid,
     offering_id: Uuid,
     quantity: u8,
 }
 
-impl AddToCartCommandData {
+impl AddToCartCommand {
     pub fn cart_id(&self) -> &Uuid {
         &self.cart_id
     }
@@ -31,23 +31,8 @@ impl AddToCartCommandData {
     }
 }
 
-impl MessageData for AddToCartCommandData {
+impl MessageData for AddToCartCommand {
     fn as_any(&self) -> &dyn Any {
         self
-    }
-}
-
-#[derive(Deserialize)]
-pub struct AddToCartCommand {
-    data: AddToCartCommandData,
-}
-
-impl Message for AddToCartCommand {
-    fn code(&self) -> TypeId {
-        TypeId::of::<AddToCartCommand>()
-    }
-
-    fn data(&self) -> &dyn MessageData {
-        &self.data
     }
 }

@@ -21,7 +21,7 @@ impl MessageHandler for CreatedCartEventHandler {
         TypeId::of::<CreatedCartEvent>()
     }
 
-    fn handle(&self, _message: &dyn Message) -> () {
+    fn handle(&self, _message: &Message) -> () {
         println!("Handling CreatedCartEvent!");
     }
 }

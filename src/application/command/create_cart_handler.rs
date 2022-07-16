@@ -11,7 +11,7 @@ use crate::services::message_bus::{
     {handler::MessageHandler, message::Message},
 };
 
-use super::create_cart_command::{CreateCartCommand, CreateCartCommandData};
+use super::create_cart_command::CreateCartCommand;
 
 pub struct CreateCartCommandHandler {
     message_queue: Arc<Mutex<MessageQueue>>,
@@ -29,18 +29,17 @@ impl MessageHandler for CreateCartCommandHandler {
         TypeId::of::<CreateCartCommand>()
     }
 
-    fn handle(&self, message: &dyn Message) {
-        let command: &CreateCartCommandData = message
+    fn handle(&self, message: &Message) {
+        let command = message
             .data()
             .as_any()
-            .downcast_ref::<CreateCartCommandData>()
+            .downcast_ref::<CreateCartCommand>()
             .unwrap();
 
         let event = CreatedCartEvent::new(command.customer_id().clone());
 
-        self.message_queue
-            .lock()
-            .unwrap()
-            .raise_event(Box::new(event));
+        let message = Message::new::<CreatedCartEvent>(event);
+
+        self.message_queue.lock().unwrap().raise_event(message);
     }
 }
