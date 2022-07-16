@@ -1,7 +1,7 @@
-use dotenv_codegen::dotenv;
-use mongodb::{options::ClientOptions, Client};
+// use dotenv_codegen::dotenv;
+// use mongodb::{options::ClientOptions, Client};
 
-use crate::services::message_bus::event::Event;
+// use crate::services::message_bus::event::Event;
 
 pub struct EventStore {}
 
@@ -10,19 +10,19 @@ impl EventStore {
         EventStore {}
     }
 
-    pub async fn write_event(&self, event: Event) {
-        let client_options = ClientOptions::parse(dotenv!("MONGODB_CONNECTION_STRING"))
-            .await
-            .unwrap();
+    // pub async fn write_event(&self, event: Event) {
+    //     let client_options = ClientOptions::parse(dotenv!("MONGODB_CONNECTION_STRING"))
+    //         .await
+    //         .unwrap();
 
-        let db = Client::with_options(client_options)
-            .unwrap()
-            .database("cqrs-event-sourcing");
+    //     let db = Client::with_options(client_options)
+    //         .unwrap()
+    //         .database("cqrs-event-sourcing");
 
-        let collection = db.collection::<Event>("event-writes");
+    //     let collection = db.collection::<Event>("event-writes");
 
-        let result = collection.insert_one(event, None).await;
+    //     let result = collection.insert_one(event, None).await;
 
-        println!("{:?}", result);
-    }
+    //     println!("{:?}", result);
+    // }
 }

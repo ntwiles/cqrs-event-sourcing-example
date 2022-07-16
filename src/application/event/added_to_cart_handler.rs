@@ -21,7 +21,7 @@ impl MessageHandler for AddedToCartEventHandler {
         TypeId::of::<AddedToCartEvent>()
     }
 
-    async fn handle(&self, message: &dyn Message) -> () {
+    fn handle(&self, _message: &dyn Message) -> () {
         println!("Handling AddedToCartEvent!");
     }
 }

@@ -1,36 +1,44 @@
 use async_trait::async_trait;
+use uuid::Uuid;
 
-use std::any::TypeId;
+use std::{
+    any::TypeId,
+    sync::{Arc, Mutex},
+};
 
 use crate::application::event::created_cart_event::CreatedCartEvent;
 use crate::services::message_bus::{
-    bus::MessageBus,
+    queue::MessageQueue,
     {handler::MessageHandler, message::Message},
 };
 
 use super::create_cart_command::CreateCartCommand;
 
-pub struct CreateCartCommandHandler<'a> {
-    // message_bus: &'a MessageBus,
+pub struct CreateCartCommandHandler {
+    message_queue: Arc<Mutex<MessageQueue>>,
 }
 
-impl<'a> CreateCartCommandHandler<'a> {
-    pub fn new(message_bus: &'a MessageBus) -> CreateCartCommandHandler<'a> {
-        CreateCartCommandHandler { 
-            //message_bus 
-        }
+impl CreateCartCommandHandler {
+    pub fn new(message_queue: Arc<Mutex<MessageQueue>>) -> CreateCartCommandHandler {
+        CreateCartCommandHandler { message_queue }
     }
 }
 
 #[async_trait]
-impl<'a> MessageHandler for CreateCartCommandHandler<'a> {
+impl MessageHandler for CreateCartCommandHandler {
     fn message_type(&self) -> TypeId {
         TypeId::of::<CreateCartCommand>()
     }
 
-    async fn handle(&self, message: &dyn Message) -> () {
-        let event = CreatedCartEvent::new(message.customer_id().clone());
+    fn handle(&self, _message: &dyn Message) {
+        println!("Handling CreateCartCommand.");
+        // let event = CreatedCartEvent::new(message.customer_id().clone());
 
-        // self.message_bus.raise_event(Box::new(event)).await;
+        let fake_event = CreatedCartEvent::new(Uuid::new_v4());
+
+        self.message_queue
+            .lock()
+            .unwrap()
+            .raise_event(Box::new(fake_event));
     }
 }

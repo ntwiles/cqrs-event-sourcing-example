@@ -4,22 +4,26 @@ use axum::{
     Extension, Router,
 };
 use dotenv::dotenv;
-use uuid::Uuid;
 
-use std::net::SocketAddr;
-use std::sync::Arc;
+use std::{
+    net::SocketAddr,
+    sync::{Arc, Mutex},
+};
 
 use crate::api::cart_controller;
 use crate::application::{
     command::{
-        create_cart_command::CreateCartCommand, create_cart_handler::CreateCartCommandHandler,
+        add_to_cart_handler::AddToCartCommandHandler, create_cart_handler::CreateCartCommandHandler,
     },
     event::{
         added_to_cart_handler::AddedToCartEventHandler,
         created_cart_handler::CreatedCartEventHandler,
     },
 };
-use crate::services::{message_bus::bus::MessageBus, persistence::event_store::EventStore};
+use crate::services::{
+    message_bus::{queue::MessageQueue, registry::HandlerRegistry, start_message_loop},
+    persistence::event_store::EventStore,
+};
 
 mod api;
 mod application;
@@ -32,22 +36,23 @@ async fn main() {
 
     let event_store = EventStore::new();
 
-    let mut bus = MessageBus::new(&event_store);
+    let queue = Arc::new(Mutex::new(MessageQueue::new(&event_store)));
+    let mut registry = HandlerRegistry::new(&event_store);
 
-    bus.register_handler(Box::new(CreateCartCommandHandler::new()));
+    // Commands
+    registry.add(Box::new(AddToCartCommandHandler::new(queue.clone())));
+    registry.add(Box::new(CreateCartCommandHandler::new(queue.clone())));
 
-    bus.register_handler(Box::new(AddedToCartEventHandler::new()));
-    bus.register_handler(Box::new(CreatedCartEventHandler::new()));
+    // Events
+    registry.add(Box::new(AddedToCartEventHandler::new()));
+    registry.add(Box::new(CreatedCartEventHandler::new()));
 
-    let create_cart_message = CreateCartCommand::new(Uuid::new_v4());
-    bus.send(Box::new(create_cart_message)).await;
-
-    let shared_bus = Arc::new(bus);
+    start_message_loop(queue.clone(), registry);
 
     let app = Router::new()
-        .layer(Extension(shared_bus))
         .route("/", get(test))
-        .route("/cart", post(cart_controller::insert));
+        .route("/cart", post(cart_controller::insert))
+        .layer(Extension(queue));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
@@ -57,6 +62,6 @@ async fn main() {
         .unwrap();
 }
 
-pub async fn test() -> impl IntoResponse {
+async fn test() -> impl IntoResponse {
     "It works!"
 }
