@@ -21,7 +21,7 @@ pub fn start_message_loop(queue: Arc<Mutex<MessageQueue>>, registry: HandlerRegi
         std::mem::drop(queue);
 
         if let Some(message) = message {
-            let handlers = registry.get_handlers(message.message_type());
+            let handlers = registry.get_handlers(message.code());
 
             for handler in handlers {
                 handler.handle(&*message);

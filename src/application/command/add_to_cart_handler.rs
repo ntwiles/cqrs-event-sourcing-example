@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use uuid::Uuid;
 
 use std::{
     any::TypeId,
@@ -11,7 +10,7 @@ use crate::services::message_bus::{
     handler::MessageHandler, message::Message, queue::MessageQueue,
 };
 
-use super::add_to_cart_command::AddToCartCommand;
+use super::add_to_cart_command::{AddToCartCommand, AddToCartCommandData};
 
 pub struct AddToCartCommandHandler {
     message_queue: Arc<Mutex<MessageQueue>>,
@@ -29,19 +28,23 @@ impl MessageHandler for AddToCartCommandHandler {
         TypeId::of::<AddToCartCommand>()
     }
 
-    fn handle(&self, _message: &dyn Message) -> () {
-        // let event = AddedToCartEvent::new(
-        //     command.cart_id().clone(),
-        //     command.customer_id().clone(),
-        //     command.offering_id().clone(),
-        //     command.quantity().clone(),
-        // );
+    fn handle(&self, message: &dyn Message) -> () {
+        let command = message
+            .data()
+            .as_any()
+            .downcast_ref::<AddToCartCommandData>()
+            .unwrap();
 
-        let fake_event = AddedToCartEvent::new(Uuid::new_v4(), Uuid::new_v4(), Uuid::new_v4(), 0);
+        let event = AddedToCartEvent::new(
+            command.cart_id().clone(),
+            command.customer_id().clone(),
+            command.offering_id().clone(),
+            command.quantity().clone(),
+        );
 
         self.message_queue
             .lock()
             .unwrap()
-            .raise_event(Box::new(fake_event));
+            .raise_event(Box::new(event));
     }
 }

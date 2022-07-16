@@ -22,6 +22,6 @@ impl MessageHandler for AddedToCartEventHandler {
     }
 
     fn handle(&self, _message: &dyn Message) -> () {
-        println!("Handling AddedToCartEvent!");
+        todo!()
     }
 }

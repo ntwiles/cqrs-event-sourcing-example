@@ -26,7 +26,7 @@ impl MessageQueue {
     }
 
     pub fn send(&mut self, message: Box<dyn Message>) {
-        println!("Sending message: {:?}", message.message_type());
+        println!("Sending message: {:?}", message.code());
         self.queue.push(message);
     }
 }
