@@ -34,7 +34,7 @@ mod services;
 async fn main() {
     dotenv().ok();
 
-    let event_store = Arc::new(EventStore::new());
+    let event_store = Arc::new(EventStore::new().await);
 
     let queue = Arc::new(Mutex::new(MessageQueue::new(event_store.clone())));
     let mut registry = HandlerRegistry::new(&event_store);

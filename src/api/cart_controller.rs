@@ -27,10 +27,10 @@ pub async fn update(
 }
 
 pub async fn read(
-    Json(command): Json<AddToCartCommand>,
-    Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
+    // Json(command): Json<AddToCartCommand>,
+    Extension(_messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
 ) -> impl IntoResponse {
-    let message = Message::new_command(command);
-    messsage_queue.lock().await.send(message);
+    // let message = Message::new_command(command);
+    // messsage_queue.lock().await.send(message);
     (StatusCode::OK, "a response!")
 }

@@ -46,6 +46,6 @@ impl MessageHandler for AddToCartCommandHandler {
             .lock()
             .await
             .raise_event::<AddedToCartEvent>(message)
-            .await;
+            .await
     }
 }

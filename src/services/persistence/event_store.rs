@@ -4,37 +4,35 @@ use dotenv_codegen::dotenv;
 use mongodb::{options::ClientOptions, Client};
 use serde::Serialize;
 
-use std::fmt::Debug;
+use std::{any, fmt::Debug};
 
 use crate::services::message_bus::event::EventData;
 
 #[derive(Debug, Serialize)]
 pub struct Event<T: EventData> {
-    id: oid::ObjectId,
-    when: DateTime<Utc>,
     data: T,
+    id: oid::ObjectId,
+    kind: String,
+    when: DateTime<Utc>,
 }
 
 impl<T: EventData> Event<T> {
     pub fn new<U: EventData>(data: U) -> Event<U> {
         Event {
-            id: oid::ObjectId::new(),
-            when: Utc::now(),
             data,
+            id: oid::ObjectId::new(),
+            kind: any::type_name::<T>().to_owned(),
+            when: Utc::now(),
         }
     }
 }
 
-pub struct EventStore {}
+pub struct EventStore {
+    db: mongodb::Database,
+}
 
 impl EventStore {
-    pub fn new() -> EventStore {
-        EventStore {}
-    }
-
-    pub async fn write_event<T: EventData>(&self, data: &T) {
-        println!("Writing event!");
-
+    pub async fn new() -> EventStore {
         let client_options = ClientOptions::parse(dotenv!("MONGODB_CONNECTION_STRING"))
             .await
             .unwrap();
@@ -43,12 +41,17 @@ impl EventStore {
             .unwrap()
             .database("cqrs-event-sourcing");
 
-        let collection = db.collection::<Event<T>>("event-writes");
+        EventStore { db }
+    }
 
-        let event: Event<T> = Event::<T>::new(*data);
+    fn collection<T: EventData>(&self) -> mongodb::Collection<Event<T>> {
+        self.db.collection::<Event<T>>("events")
+    }
 
-        let result = collection.insert_one(event, None).await;
-
+    pub async fn write_event<T: EventData>(&self, data: &T) {
+        println!("Writing event!");
+        let event = Event::<T>::new(*data);
+        let result = self.collection().insert_one(event, None).await;
         println!("{:?}", result);
     }
 }
