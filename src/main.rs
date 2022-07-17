@@ -53,7 +53,7 @@ async fn main() {
     start_message_loop(queue.clone(), registry);
 
     let app = Router::new()
-        .route("/", get(test))
+        .route("/cart", get(cart_controller::read))
         .route("/cart", post(cart_controller::create))
         .route("/cart", patch(cart_controller::update))
         .layer(Extension(queue));
@@ -64,8 +64,4 @@ async fn main() {
         .serve(app.into_make_service())
         .await
         .unwrap();
-}
-
-async fn test() -> impl IntoResponse {
-    "It works!"
 }

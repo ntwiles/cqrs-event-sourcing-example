@@ -24,3 +24,12 @@ pub async fn update(
     messsage_queue.lock().unwrap().send(message);
     StatusCode::OK
 }
+
+pub async fn read(
+    Json(command): Json<AddToCartCommand>,
+    Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
+) -> impl IntoResponse {
+    let message = Message::new_command(command);
+    messsage_queue.lock().unwrap().send(message);
+    (StatusCode::OK, "a response!")
+}
