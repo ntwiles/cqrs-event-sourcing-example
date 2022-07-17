@@ -4,23 +4,25 @@ pub mod message;
 pub mod queue;
 pub mod registry;
 
-use std::{
-    sync::{Arc, Mutex},
-    thread,
-};
+use futures::lock::Mutex;
+use tokio;
+
+use std::sync::Arc;
 
 use queue::MessageQueue;
 use registry::HandlerRegistry;
 
 pub fn start_message_loop(queue: Arc<Mutex<MessageQueue>>, registry: HandlerRegistry) {
-    thread::spawn(move || loop {
-        let message = queue.lock().unwrap().pop_queue();
+    tokio::spawn(async move {
+        loop {
+            let message = queue.lock().await.pop_queue();
 
-        if let Some(message) = message {
-            let handlers = registry.get_handlers(message.code());
+            if let Some(message) = message {
+                let handlers = registry.get_handlers(message.code());
 
-            for handler in handlers {
-                handler.handle(&message);
+                for handler in handlers {
+                    handler.handle(&message).await;
+                }
             }
         }
     });

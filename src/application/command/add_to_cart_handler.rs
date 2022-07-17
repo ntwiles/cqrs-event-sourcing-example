@@ -1,9 +1,7 @@
 use async_trait::async_trait;
+use futures::lock::Mutex;
 
-use std::{
-    any::TypeId,
-    sync::{Arc, Mutex},
-};
+use std::{any::TypeId, sync::Arc};
 
 use crate::application::event::added_to_cart_event::AddedToCartEvent;
 use crate::services::message_bus::{
@@ -28,7 +26,7 @@ impl MessageHandler for AddToCartCommandHandler {
         TypeId::of::<AddToCartCommand>()
     }
 
-    fn handle(&self, message: &Message) -> () {
+    async fn handle(&self, message: &Message) -> () {
         let command = message
             .data()
             .as_any()
@@ -46,7 +44,8 @@ impl MessageHandler for AddToCartCommandHandler {
 
         self.message_queue
             .lock()
-            .unwrap()
-            .raise_event::<AddedToCartEvent>(message);
+            .await
+            .raise_event::<AddedToCartEvent>(message)
+            .await;
     }
 }

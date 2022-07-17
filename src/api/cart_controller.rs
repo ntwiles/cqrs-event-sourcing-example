@@ -1,6 +1,7 @@
 use axum::{http::StatusCode, response::IntoResponse, Extension, Json};
+use futures::lock::Mutex;
 
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use crate::application::command::{
     add_to_cart_command::AddToCartCommand, create_cart_command::CreateCartCommand,
@@ -12,7 +13,7 @@ pub async fn create<'a>(
     Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
 ) -> impl IntoResponse {
     let message = Message::new_command(command);
-    messsage_queue.lock().unwrap().send(message);
+    messsage_queue.lock().await.send(message);
     StatusCode::CREATED
 }
 
@@ -21,7 +22,7 @@ pub async fn update(
     Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
 ) -> impl IntoResponse {
     let message = Message::new_command(command);
-    messsage_queue.lock().unwrap().send(message);
+    messsage_queue.lock().await.send(message);
     StatusCode::OK
 }
 
@@ -30,6 +31,6 @@ pub async fn read(
     Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
 ) -> impl IntoResponse {
     let message = Message::new_command(command);
-    messsage_queue.lock().unwrap().send(message);
+    messsage_queue.lock().await.send(message);
     (StatusCode::OK, "a response!")
 }

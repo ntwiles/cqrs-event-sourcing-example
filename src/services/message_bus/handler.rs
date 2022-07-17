@@ -7,5 +7,5 @@ use super::message::Message;
 #[async_trait]
 pub trait MessageHandler: Send + Sync {
     fn message_type(&self) -> TypeId;
-    fn handle(&self, message: &Message);
+    async fn handle(&self, message: &Message);
 }

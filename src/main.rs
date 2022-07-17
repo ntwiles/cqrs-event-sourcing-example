@@ -1,14 +1,11 @@
 use axum::{
-    response::IntoResponse,
     routing::{get, patch, post},
     Extension, Router,
 };
 use dotenv::dotenv;
+use futures::lock::Mutex;
 
-use std::{
-    net::SocketAddr,
-    sync::{Arc, Mutex},
-};
+use std::{net::SocketAddr, sync::Arc};
 
 use crate::{
     api::cart_controller,

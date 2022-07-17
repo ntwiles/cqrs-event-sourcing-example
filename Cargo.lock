@@ -112,7 +112,7 @@ dependencies = [
  "serde_bytes",
  "serde_json",
  "time 0.3.11",
- "uuid 0.8.2",
+ "uuid",
 ]
 
 [[package]]
@@ -168,14 +168,15 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "axum",
+ "bson",
  "chrono",
  "dotenv",
  "dotenv_codegen",
+ "futures",
  "mongodb",
  "serde",
  "serde_json",
  "tokio",
- "uuid 1.1.2",
 ]
 
 [[package]]
@@ -309,12 +310,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "futures"
+version = "0.3.21"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f73fe65f54d1e12b726f517d3e2135ca3125a437b6d998caf1962961f7172d9e"
+dependencies = [
+ "futures-channel",
+ "futures-core",
+ "futures-executor",
+ "futures-io",
+ "futures-sink",
+ "futures-task",
+ "futures-util",
+]
+
+[[package]]
 name = "futures-channel"
 version = "0.3.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3083ce4b914124575708913bca19bfe887522d6e2e6d0952943f5eac4a74010"
 dependencies = [
  "futures-core",
+ "futures-sink",
 ]
 
 [[package]]
@@ -369,9 +386,11 @@ version = "0.3.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8b7abd5d659d9b90c8cba917f6ec750a74e2dc23902ef9cd4cc8c8b22e6036a"
 dependencies = [
+ "futures-channel",
  "futures-core",
  "futures-io",
  "futures-macro",
+ "futures-sink",
  "futures-task",
  "memchr",
  "pin-project-lite",
@@ -709,7 +728,7 @@ dependencies = [
  "trust-dns-proto",
  "trust-dns-resolver",
  "typed-builder",
- "uuid 0.8.2",
+ "uuid",
  "webpki-roots",
 ]
 
@@ -1495,29 +1514,6 @@ checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
 dependencies = [
  "getrandom",
  "serde",
-]
-
-[[package]]
-name = "uuid"
-version = "1.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd6469f4314d5f1ffec476e05f17cc9a78bc7a27a6a857842170bdf8d6f98d2f"
-dependencies = [
- "getrandom",
- "rand",
- "serde",
- "uuid-macro-internal",
-]
-
-[[package]]
-name = "uuid-macro-internal"
-version = "1.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "548f7181a5990efa50237abb7ebca410828b57a8955993334679f8b50b35c97d"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]

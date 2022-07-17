@@ -1,4 +1,4 @@
-use std::{sync::Arc, thread};
+use std::sync::Arc;
 
 use crate::services::message_bus::{event::EventData, message::MessageData};
 use crate::services::persistence::event_store::EventStore;
@@ -22,7 +22,8 @@ impl MessageQueue {
         self.queue.pop()
     }
 
-    pub fn raise_event<T: 'static + MessageData + EventData>(&mut self, event: Message) {
+    pub async fn raise_event<T: 'static + MessageData + EventData>(&mut self, event: Message) {
+        println!("Raising event: {:?}", event.code());
         let store = self.event_store.clone();
         let data = (*(event.data()))
             .as_any()
@@ -30,8 +31,7 @@ impl MessageQueue {
             .unwrap()
             .clone();
 
-        thread::spawn(move || async move { store.write_event::<T>(&data).await });
-
+        store.write_event::<T>(&data).await;
         self.send(event);
     }
 

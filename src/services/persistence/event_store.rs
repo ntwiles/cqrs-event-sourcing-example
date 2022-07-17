@@ -1,8 +1,8 @@
+use bson::oid;
 use chrono::{offset::Utc, DateTime};
 use dotenv_codegen::dotenv;
 use mongodb::{options::ClientOptions, Client};
 use serde::Serialize;
-use uuid::Uuid;
 
 use std::fmt::Debug;
 
@@ -10,7 +10,7 @@ use crate::services::message_bus::event::EventData;
 
 #[derive(Debug, Serialize)]
 pub struct Event<T: EventData> {
-    id: Uuid,
+    id: oid::ObjectId,
     when: DateTime<Utc>,
     data: T,
 }
@@ -18,7 +18,7 @@ pub struct Event<T: EventData> {
 impl<T: EventData> Event<T> {
     pub fn new<U: EventData>(data: U) -> Event<U> {
         Event {
-            id: Uuid::new_v4(),
+            id: oid::ObjectId::new(),
             when: Utc::now(),
             data,
         }
@@ -33,6 +33,8 @@ impl EventStore {
     }
 
     pub async fn write_event<T: EventData>(&self, data: &T) {
+        println!("Writing event!");
+
         let client_options = ClientOptions::parse(dotenv!("MONGODB_CONNECTION_STRING"))
             .await
             .unwrap();

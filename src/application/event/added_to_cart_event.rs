@@ -1,5 +1,5 @@
+use bson::oid;
 use serde::Serialize;
-use uuid::Uuid;
 
 use std::any::Any;
 
@@ -7,17 +7,17 @@ use crate::services::message_bus::{event::EventData, message::MessageData};
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize)]
 pub struct AddedToCartEvent {
-    customer_id: Uuid,
-    cart_id: Uuid,
-    offering_id: Uuid,
+    customer_id: oid::ObjectId,
+    cart_id: oid::ObjectId,
+    offering_id: oid::ObjectId,
     quantity: u8,
 }
 
 impl AddedToCartEvent {
     pub fn new(
-        cart_id: Uuid,
-        customer_id: Uuid,
-        offering_id: Uuid,
+        cart_id: oid::ObjectId,
+        customer_id: oid::ObjectId,
+        offering_id: oid::ObjectId,
         quantity: u8,
     ) -> AddedToCartEvent {
         AddedToCartEvent {
