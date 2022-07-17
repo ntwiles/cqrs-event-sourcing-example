@@ -42,7 +42,7 @@ impl MessageHandler for AddToCartCommandHandler {
             command.quantity().clone(),
         );
 
-        let message = Message::new_event::<AddedToCartEvent>(event);
+        let message = Message::new_event(event);
 
         self.message_queue
             .lock()

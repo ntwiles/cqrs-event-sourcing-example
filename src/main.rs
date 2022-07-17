@@ -1,6 +1,6 @@
 use axum::{
     response::IntoResponse,
-    routing::{get, post},
+    routing::{get, patch, post},
     Extension, Router,
 };
 use dotenv::dotenv;
@@ -54,7 +54,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(test))
-        .route("/cart", post(cart_controller::insert))
+        .route("/cart", post(cart_controller::create))
+        .route("/cart", patch(cart_controller::update))
         .layer(Extension(queue));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
