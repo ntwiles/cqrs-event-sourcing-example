@@ -23,12 +23,12 @@ impl MessageQueue {
     }
 
     pub fn send_command<T: 'static + MessageData>(&mut self, command: T) {
-        let message = Message::new_command(command);
+        let message = Message::new(command);
         self.send(message);
     }
 
     pub async fn raise_event<T: 'static + MessageData + EventData>(&mut self, event: T) {
-        let message = Message::new_event(event);
+        let message = Message::new(event);
         let store = self.event_store.clone();
 
         store.write_event(&event).await;

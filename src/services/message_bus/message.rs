@@ -3,8 +3,6 @@ use std::{
     fmt::Debug,
 };
 
-use super::event::EventData;
-
 pub trait MessageData: Debug + Send + Sync {
     fn as_any(&self) -> &dyn Any;
 }
@@ -16,14 +14,7 @@ pub struct Message {
 }
 
 impl Message {
-    pub fn new_command<T: 'static + MessageData>(data: T) -> Message {
-        Message {
-            code: TypeId::of::<T>(),
-            data: Box::new(data),
-        }
-    }
-
-    pub fn new_event<T: 'static + MessageData + EventData>(data: T) -> Message {
+    pub fn new<T: 'static + MessageData>(data: T) -> Message {
         Message {
             code: TypeId::of::<T>(),
             data: Box::new(data),
