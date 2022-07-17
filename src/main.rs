@@ -4,8 +4,9 @@ use axum::{
 };
 use dotenv::dotenv;
 use futures::lock::Mutex;
+use maplit::hashmap;
 
-use std::{net::SocketAddr, sync::Arc};
+use std::{any::TypeId, net::SocketAddr, sync::Arc};
 
 use crate::{
     api::cart_controller,
@@ -15,8 +16,8 @@ use crate::{
             create_cart_handler::CreateCartCommandHandler,
         },
         event::{
-            added_to_cart_handler::AddedToCartEventHandler,
-            created_cart_handler::CreatedCartEventHandler,
+            added_to_cart_event::AddedToCartEvent, added_to_cart_handler::AddedToCartEventHandler,
+            created_cart_event::CreatedCartEvent, created_cart_handler::CreatedCartEventHandler,
         },
     },
     services::{
@@ -34,16 +35,22 @@ mod services;
 async fn main() {
     dotenv().ok();
 
-    let event_store = Arc::new(EventStore::new().await);
+    // Used for mapping event types onto human-readable mongodb entries.
+    let event_kinds = hashmap! {
+        TypeId::of::<AddedToCartEvent>() => "addToCart".to_string(),
+        TypeId::of::<CreatedCartEvent>() => "createdCart".to_string()
+    };
+
+    let event_store = Arc::new(EventStore::new(event_kinds).await);
 
     let queue = Arc::new(Mutex::new(MessageQueue::new(event_store.clone())));
     let mut registry = HandlerRegistry::new(&event_store);
 
-    // Commands
+    // commands
     registry.add(Box::new(AddToCartCommandHandler::new(queue.clone())));
     registry.add(Box::new(CreateCartCommandHandler::new(queue.clone())));
 
-    // Events
+    // events
     registry.add(Box::new(AddedToCartEventHandler::new()));
     registry.add(Box::new(CreatedCartEventHandler::new()));
 

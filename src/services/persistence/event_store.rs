@@ -4,7 +4,7 @@ use dotenv_codegen::dotenv;
 use mongodb::{options::ClientOptions, Client};
 use serde::Serialize;
 
-use std::{any, fmt::Debug};
+use std::{any::TypeId, collections::HashMap, fmt::Debug};
 
 use crate::services::message_bus::event::EventData;
 
@@ -17,11 +17,11 @@ pub struct Event<T: EventData> {
 }
 
 impl<T: EventData> Event<T> {
-    pub fn new<U: EventData>(data: U) -> Event<U> {
+    pub fn new<U: EventData>(data: U, kind: String) -> Event<U> {
         Event {
             data,
             id: oid::ObjectId::new(),
-            kind: any::type_name::<T>().to_owned(),
+            kind,
             when: Utc::now(),
         }
     }
@@ -29,10 +29,11 @@ impl<T: EventData> Event<T> {
 
 pub struct EventStore {
     db: mongodb::Database,
+    kinds: HashMap<TypeId, String>,
 }
 
 impl EventStore {
-    pub async fn new() -> EventStore {
+    pub async fn new(kinds: HashMap<TypeId, String>) -> EventStore {
         let client_options = ClientOptions::parse(dotenv!("MONGODB_CONNECTION_STRING"))
             .await
             .unwrap();
@@ -41,16 +42,23 @@ impl EventStore {
             .unwrap()
             .database("cqrs-event-sourcing");
 
-        EventStore { db }
+        EventStore { db, kinds }
     }
 
     fn collection<T: EventData>(&self) -> mongodb::Collection<Event<T>> {
         self.db.collection::<Event<T>>("events")
     }
 
-    pub async fn write_event<T: EventData>(&self, data: &T) {
+    pub async fn write_event<T: EventData>(&self, data: &T, code: TypeId) {
         println!("Writing event!");
-        let event = Event::<T>::new(*data);
+
+        let kind = self
+            .kinds
+            .get(&code)
+            .expect(&format!("No kind name recorded for event code {:?}", code))
+            .to_string();
+
+        let event = Event::<T>::new(*data, kind);
         let result = self.collection().insert_one(event, None).await;
         println!("{:?}", result);
     }
