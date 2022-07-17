@@ -11,6 +11,10 @@ pub struct CreateCartCommand {
 }
 
 impl CreateCartCommand {
+    // pub fn new(customer_id: oid::ObjectId) -> CreateCartCommand {
+    //     CreateCartCommand { customer_id }
+    // }
+
     pub fn customer_id(&self) -> &oid::ObjectId {
         &self.customer_id
     }

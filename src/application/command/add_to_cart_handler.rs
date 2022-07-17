@@ -40,12 +40,6 @@ impl MessageHandler for AddToCartCommandHandler {
             command.quantity().clone(),
         );
 
-        let message = Message::new_event(event);
-
-        self.message_queue
-            .lock()
-            .await
-            .raise_event::<AddedToCartEvent>(message)
-            .await
+        self.message_queue.lock().await.raise_event(event).await
     }
 }

@@ -22,20 +22,20 @@ impl MessageQueue {
         self.queue.pop()
     }
 
-    pub async fn raise_event<T: 'static + MessageData + EventData>(&mut self, event: Message) {
-        println!("Raising event: {:?}", event.code());
-        let store = self.event_store.clone();
-        let data = (*(event.data()))
-            .as_any()
-            .downcast_ref::<T>()
-            .unwrap()
-            .clone();
-
-        store.write_event::<T>(&data).await;
-        self.send(event);
+    pub fn send_command<T: 'static + MessageData>(&mut self, command: T) {
+        let message = Message::new_command(command);
+        self.send(message);
     }
 
-    pub fn send(&mut self, message: Message) {
+    pub async fn raise_event<T: 'static + MessageData + EventData>(&mut self, event: T) {
+        let message = Message::new_event(event);
+        let store = self.event_store.clone();
+
+        store.write_event(&event).await;
+        self.send(message);
+    }
+
+    fn send(&mut self, message: Message) {
         println!("Sending message: {:?}", message.code());
         self.queue.push(message);
     }

@@ -36,12 +36,6 @@ impl MessageHandler for CreateCartCommandHandler {
 
         let event = CreatedCartEvent::new(command.customer_id().clone());
 
-        let message = Message::new_event::<CreatedCartEvent>(event);
-
-        self.message_queue
-            .lock()
-            .await
-            .raise_event::<CreatedCartEvent>(message)
-            .await;
+        self.message_queue.lock().await.raise_event(event).await;
     }
 }
