@@ -30,7 +30,7 @@ impl MessageQueue {
     pub async fn raise_event<T: 'static + MessageData + EventData>(&mut self, event: T) {
         let message = Message::new(event);
         let store = self.event_store.clone();
-        store.write_event(&event, message.code()).await;
+        store.write_event(&event).await;
         self.send(message);
     }
 

@@ -4,9 +4,8 @@ use axum::{
 };
 use dotenv::dotenv;
 use futures::lock::Mutex;
-use maplit::hashmap;
 
-use std::{any::TypeId, net::SocketAddr, sync::Arc};
+use std::{net::SocketAddr, sync::Arc};
 
 use crate::{
     api::cart_controller,
@@ -16,8 +15,8 @@ use crate::{
             create_cart_handler::CreateCartCommandHandler,
         },
         event::{
-            added_to_cart_event::AddedToCartEvent, added_to_cart_handler::AddedToCartEventHandler,
-            created_cart_event::CreatedCartEvent, created_cart_handler::CreatedCartEventHandler,
+            added_to_cart_handler::AddedToCartEventHandler,
+            created_cart_handler::CreatedCartEventHandler,
         },
     },
     services::{
@@ -35,13 +34,7 @@ mod services;
 async fn main() {
     dotenv().ok();
 
-    // Used for mapping event types onto human-readable mongodb entries.
-    let event_kinds = hashmap! {
-        TypeId::of::<AddedToCartEvent>() => "addToCart".to_string(),
-        TypeId::of::<CreatedCartEvent>() => "createdCart".to_string()
-    };
-
-    let event_store = Arc::new(EventStore::new(event_kinds).await);
+    let event_store = Arc::new(EventStore::new().await);
 
     let queue = Arc::new(Mutex::new(MessageQueue::new(event_store.clone())));
     let mut registry = HandlerRegistry::new(&event_store);

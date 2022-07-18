@@ -35,4 +35,8 @@ impl MessageData for AddedToCartEvent {
     }
 }
 
-impl EventData for AddedToCartEvent {}
+impl EventData for AddedToCartEvent {
+    fn kind(&self) -> String {
+        "addedToCart".to_string()
+    }
+}
