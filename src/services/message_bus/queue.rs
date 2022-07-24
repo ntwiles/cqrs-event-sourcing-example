@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::VecDeque, sync::Arc};
 
 use crate::services::message_bus::{event::EventData, message::MessageData};
 use crate::services::persistence::event_store::EventStore;
@@ -6,7 +6,7 @@ use crate::services::persistence::event_store::EventStore;
 use super::message::Message;
 
 pub struct MessageQueue {
-    queue: Vec<Message>,
+    queue: VecDeque<Message>,
     event_store: Arc<EventStore>,
 }
 
@@ -14,12 +14,12 @@ impl MessageQueue {
     pub fn new(event_store: Arc<EventStore>) -> MessageQueue {
         MessageQueue {
             event_store,
-            queue: Vec::new(),
+            queue: VecDeque::new(),
         }
     }
 
     pub fn pop_queue(&mut self) -> Option<Message> {
-        self.queue.pop()
+        self.queue.pop_front()
     }
 
     pub fn send_command<T: 'static + MessageData>(&mut self, command: T) {
@@ -36,6 +36,6 @@ impl MessageQueue {
 
     fn send(&mut self, message: Message) {
         println!("Sending message: {:?}", message.code());
-        self.queue.push(message);
+        self.queue.push_back(message);
     }
 }
