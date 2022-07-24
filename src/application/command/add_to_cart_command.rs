@@ -7,17 +7,12 @@ use crate::infrastructure::message_bus::message::MessageData;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AddToCartCommand {
-    cart_id: oid::ObjectId,
     customer_id: oid::ObjectId,
     offering_id: oid::ObjectId,
     quantity: u8,
 }
 
 impl AddToCartCommand {
-    pub fn cart_id(&self) -> &oid::ObjectId {
-        &self.cart_id
-    }
-
     pub fn customer_id(&self) -> &oid::ObjectId {
         &self.customer_id
     }

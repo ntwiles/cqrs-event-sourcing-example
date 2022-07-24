@@ -34,7 +34,6 @@ impl MessageHandler for AddToCartCommandHandler {
             .unwrap();
 
         let event = AddedToCartEvent::new(
-            command.cart_id().clone(),
             command.customer_id().clone(),
             command.offering_id().clone(),
             command.quantity().clone(),

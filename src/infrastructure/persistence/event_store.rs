@@ -56,5 +56,5 @@ impl EventStore {
         println!("{:?}", result);
     }
 
-    pub async fn find_events(&self, )
+    pub async fn find_events(&self, user_id: String) {}
 }
