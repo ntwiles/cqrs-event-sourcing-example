@@ -26,7 +26,5 @@ pub async fn update(
 
 pub async fn read(// Json(command): Json<AddToCartCommand>,
 ) -> impl IntoResponse {
-    // let message = Message::new_command(command);
-    // messsage_queue.lock().await.send(message);
     (StatusCode::OK, "a response!")
 }

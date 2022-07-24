@@ -21,7 +21,7 @@ use crate::{
     },
     infrastructure::{
         message_bus::{queue::MessageQueue, registry::HandlerRegistry, start_message_loop},
-        persistence::event_store::EventStore,
+        persistence::events::EventsService,
     },
 };
 
@@ -34,10 +34,10 @@ mod infrastructure;
 async fn main() {
     dotenv().ok();
 
-    let event_store = Arc::new(EventStore::new().await);
+    let events_service = Arc::new(EventsService::new().await);
 
-    let queue = Arc::new(Mutex::new(MessageQueue::new(event_store.clone())));
-    let mut registry = HandlerRegistry::new(&event_store);
+    let queue = Arc::new(Mutex::new(MessageQueue::new(events_service.clone())));
+    let mut registry = HandlerRegistry::new(&events_service);
 
     // commands
     registry.add(Box::new(AddToCartCommandHandler::new(queue.clone())));

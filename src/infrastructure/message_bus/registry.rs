@@ -1,6 +1,6 @@
 use std::any::TypeId;
 
-use crate::infrastructure::persistence::event_store::EventStore;
+use crate::infrastructure::persistence::events::EventsService;
 
 use super::handler::MessageHandler;
 
@@ -9,7 +9,7 @@ pub struct HandlerRegistry {
 }
 
 impl HandlerRegistry {
-    pub fn new(_event_store: &EventStore) -> HandlerRegistry {
+    pub fn new(_event_store: &EventsService) -> HandlerRegistry {
         HandlerRegistry {
             handlers: Vec::new(),
         }

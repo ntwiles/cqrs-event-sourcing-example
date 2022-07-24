@@ -33,12 +33,13 @@ impl MessageHandler for AddToCartCommandHandler {
             .downcast_ref::<AddToCartCommand>()
             .unwrap();
 
-        let event = AddedToCartEvent::new(
-            command.customer_id().clone(),
-            command.offering_id().clone(),
-            command.quantity().clone(),
-        );
+        let event =
+            AddedToCartEvent::new(command.offering_id().clone(), command.quantity().clone());
 
-        self.message_queue.lock().await.raise_event(event).await
+        self.message_queue
+            .lock()
+            .await
+            .raise_event(*command.customer_id(), event)
+            .await
     }
 }

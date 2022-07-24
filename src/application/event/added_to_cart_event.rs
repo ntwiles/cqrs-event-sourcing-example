@@ -7,19 +7,13 @@ use crate::infrastructure::message_bus::{event::EventData, message::MessageData}
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize)]
 pub struct AddedToCartEvent {
-    customer_id: oid::ObjectId,
     offering_id: oid::ObjectId,
     quantity: u8,
 }
 
 impl AddedToCartEvent {
-    pub fn new(
-        customer_id: oid::ObjectId,
-        offering_id: oid::ObjectId,
-        quantity: u8,
-    ) -> AddedToCartEvent {
+    pub fn new(offering_id: oid::ObjectId, quantity: u8) -> AddedToCartEvent {
         AddedToCartEvent {
-            customer_id,
             offering_id,
             quantity,
         }
