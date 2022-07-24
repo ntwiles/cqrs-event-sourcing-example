@@ -24,9 +24,7 @@ pub async fn update(
     StatusCode::OK
 }
 
-pub async fn read(
-    // Json(command): Json<AddToCartCommand>,
-    Extension(_messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
+pub async fn read(// Json(command): Json<AddToCartCommand>,
 ) -> impl IntoResponse {
     // let message = Message::new_command(command);
     // messsage_queue.lock().await.send(message);
