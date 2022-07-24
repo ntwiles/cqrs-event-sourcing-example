@@ -1,7 +1,7 @@
 use std::{collections::VecDeque, sync::Arc};
 
-use crate::services::message_bus::{event::EventData, message::MessageData};
-use crate::services::persistence::event_store::EventStore;
+use crate::infrastructure::message_bus::{event::EventData, message::MessageData};
+use crate::infrastructure::persistence::event_store::EventStore;
 
 use super::message::Message;
 

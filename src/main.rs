@@ -19,7 +19,7 @@ use crate::{
             created_cart_handler::CreatedCartEventHandler,
         },
     },
-    services::{
+    infrastructure::{
         message_bus::{queue::MessageQueue, registry::HandlerRegistry, start_message_loop},
         persistence::event_store::EventStore,
     },
@@ -28,7 +28,7 @@ use crate::{
 mod api;
 mod application;
 mod domain;
-mod services;
+mod infrastructure;
 
 #[tokio::main]
 async fn main() {

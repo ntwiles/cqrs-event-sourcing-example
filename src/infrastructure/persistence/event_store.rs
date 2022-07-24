@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use std::fmt::Debug;
 
-use crate::services::message_bus::event::EventData;
+use crate::infrastructure::message_bus::event::EventData;
 
 #[derive(Debug, Serialize)]
 pub struct Event<T: EventData> {
@@ -55,4 +55,6 @@ impl EventStore {
         let result = self.collection().insert_one(event, None).await;
         println!("{:?}", result);
     }
+
+    pub async fn find_events(&self, )
 }

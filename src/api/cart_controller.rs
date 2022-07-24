@@ -6,7 +6,7 @@ use std::sync::Arc;
 use crate::application::command::{
     add_to_cart_command::AddToCartCommand, create_cart_command::CreateCartCommand,
 };
-use crate::services::message_bus::queue::MessageQueue;
+use crate::infrastructure::message_bus::queue::MessageQueue;
 
 pub async fn create<'a>(
     Json(command): Json<CreateCartCommand>,

@@ -1,6 +1,6 @@
 use std::any::TypeId;
 
-use crate::services::persistence::event_store::EventStore;
+use crate::infrastructure::persistence::event_store::EventStore;
 
 use super::handler::MessageHandler;
 

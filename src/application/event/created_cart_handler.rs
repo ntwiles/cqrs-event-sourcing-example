@@ -2,7 +2,7 @@ use async_trait::async_trait;
 
 use std::any::TypeId;
 
-use crate::services::message_bus::{handler::MessageHandler, message::Message};
+use crate::infrastructure::message_bus::{handler::MessageHandler, message::Message};
 
 use super::created_cart_event::CreatedCartEvent;
 

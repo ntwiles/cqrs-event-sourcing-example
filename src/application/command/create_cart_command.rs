@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use std::any::Any;
 
-use crate::services::message_bus::message::MessageData;
+use crate::infrastructure::message_bus::message::MessageData;
 
 #[derive(Debug, Deserialize)]
 pub struct CreateCartCommand {

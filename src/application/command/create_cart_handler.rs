@@ -4,7 +4,7 @@ use futures::lock::Mutex;
 use std::{any::TypeId, sync::Arc};
 
 use crate::application::event::created_cart_event::CreatedCartEvent;
-use crate::services::message_bus::{
+use crate::infrastructure::message_bus::{
     queue::MessageQueue,
     {handler::MessageHandler, message::Message},
 };
