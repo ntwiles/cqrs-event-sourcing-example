@@ -25,12 +25,12 @@ impl Event {
     }
 }
 
-pub struct EventsService {
+pub struct EventService {
     db: mongodb::Database,
 }
 
-impl EventsService {
-    pub async fn new() -> EventsService {
+impl EventService {
+    pub async fn new() -> EventService {
         let client_options = ClientOptions::parse(dotenv!("MONGODB_CONNECTION_STRING"))
             .await
             .unwrap();
@@ -39,7 +39,7 @@ impl EventsService {
             .unwrap()
             .database("cqrs-event-sourcing");
 
-        EventsService { db }
+        EventService { db }
     }
 
     fn collection(&self) -> mongodb::Collection<Event> {

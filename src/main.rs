@@ -21,7 +21,7 @@ use crate::{
     },
     infrastructure::{
         message_bus::{queue::MessageQueue, registry::HandlerRegistry, start_message_loop},
-        persistence::events::EventsService,
+        persistence::events::EventService,
     },
 };
 
@@ -34,7 +34,7 @@ mod infrastructure;
 async fn main() {
     dotenv().ok();
 
-    let events_service = Arc::new(EventsService::new().await);
+    let events_service = Arc::new(EventService::new().await);
 
     let queue = Arc::new(Mutex::new(MessageQueue::new(events_service.clone())));
     let mut registry = HandlerRegistry::new(&events_service);

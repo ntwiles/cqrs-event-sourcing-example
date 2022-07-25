@@ -2,17 +2,17 @@ use bson::oid;
 
 use std::{collections::VecDeque, sync::Arc};
 
-use crate::infrastructure::persistence::events::EventsService;
+use crate::infrastructure::persistence::events::EventService;
 
 use super::message::Message;
 
 pub struct MessageQueue {
     queue: VecDeque<Message>,
-    event_store: Arc<EventsService>,
+    event_store: Arc<EventService>,
 }
 
 impl MessageQueue {
-    pub fn new(event_store: Arc<EventsService>) -> MessageQueue {
+    pub fn new(event_store: Arc<EventService>) -> MessageQueue {
         MessageQueue {
             event_store,
             queue: VecDeque::new(),

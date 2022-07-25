@@ -1,10 +1,10 @@
 use bson::oid;
 
 use crate::domain::cart::Cart;
-use crate::infrastructure::persistence::events::EventsService;
+use crate::infrastructure::persistence::events::EventService;
 
 pub struct CartStore {
-    events_service: EventsService,
+    events_service: EventService,
 }
 
 impl CartStore {

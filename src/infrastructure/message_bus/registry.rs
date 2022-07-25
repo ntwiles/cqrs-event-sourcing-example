@@ -1,4 +1,4 @@
-use crate::infrastructure::persistence::events::EventsService;
+use crate::infrastructure::persistence::events::EventService;
 
 use super::handler::MessageHandler;
 
@@ -7,7 +7,7 @@ pub struct HandlerRegistry {
 }
 
 impl HandlerRegistry {
-    pub fn new(_event_store: &EventsService) -> HandlerRegistry {
+    pub fn new(_event_store: &EventService) -> HandlerRegistry {
         HandlerRegistry {
             handlers: Vec::new(),
         }
