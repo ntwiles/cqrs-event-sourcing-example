@@ -2,5 +2,5 @@
 
 // pub struct Partner {
 //     name: String,
-//     offerings: Vec<Offering>
+//     offerings: Vec<Offering>,
 // }

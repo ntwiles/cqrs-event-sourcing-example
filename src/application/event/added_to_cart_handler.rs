@@ -1,10 +1,6 @@
 use async_trait::async_trait;
 
-use std::any::TypeId;
-
 use crate::infrastructure::message_bus::{handler::MessageHandler, message::Message};
-
-use super::added_to_cart_event::AddedToCartEvent;
 
 #[derive(Clone)]
 pub struct AddedToCartEventHandler {}
@@ -17,8 +13,8 @@ impl AddedToCartEventHandler {
 
 #[async_trait]
 impl MessageHandler for AddedToCartEventHandler {
-    fn message_type(&self) -> TypeId {
-        TypeId::of::<AddedToCartEvent>()
+    fn message_kind(&self) -> String {
+        "addedToCart".to_string()
     }
 
     async fn handle(&self, _message: &Message) -> () {

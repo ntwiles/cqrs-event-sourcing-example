@@ -6,22 +6,20 @@ use serde::Serialize;
 
 use std::fmt::Debug;
 
-use crate::infrastructure::message_bus::event::EventData;
-
 #[derive(Debug, Serialize)]
-pub struct Event<T: EventData> {
-    data: T,
+pub struct Event {
+    data: bson::Bson,
     kind: String,
     correlation_id: oid::ObjectId,
     when: DateTime<Utc>,
 }
 
-impl<T: EventData> Event<T> {
-    pub fn new<U: EventData>(correlation_id: oid::ObjectId, data: U) -> Event<U> {
+impl Event {
+    pub fn new(correlation_id: oid::ObjectId, kind: String, data: bson::Bson) -> Event {
         Event {
-            data,
-            kind: data.kind(),
             correlation_id,
+            data,
+            kind,
             when: Utc::now(),
         }
     }
@@ -44,28 +42,26 @@ impl EventsService {
         EventsService { db }
     }
 
-    fn collection<T: EventData>(&self) -> mongodb::Collection<Event<T>> {
-        self.db.collection::<Event<T>>("events")
+    fn collection(&self) -> mongodb::Collection<Event> {
+        self.db.collection::<Event>("events")
     }
 
-    pub async fn write_event<T: EventData>(&self, correlation_id: oid::ObjectId, data: T) {
+    pub async fn write_event(&self, correlation_id: oid::ObjectId, kind: String, data: bson::Bson) {
         println!("Writing event!");
 
-        let event = Event::<T>::new(correlation_id, data);
+        let event = Event::new(correlation_id, kind, data);
         let result = self.collection().insert_one(event, None).await;
         println!("{:?}", result);
     }
 
-    pub async fn find_events<T: EventData>(
+    pub async fn find_events(
         &self,
         correlation_id: oid::ObjectId,
-        kind: String,
-    ) -> Result<mongodb::Cursor<Event<T>>, mongodb::error::Error> {
-        self.collection::<T>()
+    ) -> Result<mongodb::Cursor<Event>, mongodb::error::Error> {
+        self.collection()
             .find(
                 doc! {
                     "correlation_id": correlation_id,
-                    "kind": kind
                 },
                 None,
             )

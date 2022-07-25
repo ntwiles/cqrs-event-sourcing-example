@@ -1,11 +1,11 @@
 use bson::oid;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use std::any::Any;
 
 use crate::infrastructure::message_bus::message::MessageData;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct CreateCartCommand {
     customer_id: oid::ObjectId,
 }

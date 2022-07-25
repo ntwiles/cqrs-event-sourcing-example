@@ -1,7 +1,4 @@
-use std::{
-    any::{Any, TypeId},
-    fmt::Debug,
-};
+use std::{any::Any, fmt::Debug};
 
 pub trait MessageData: Debug + Send + Sync {
     fn as_any(&self) -> &dyn Any;
@@ -9,23 +6,20 @@ pub trait MessageData: Debug + Send + Sync {
 
 #[derive(Debug)]
 pub struct Message {
-    code: TypeId,
-    data: Box<dyn MessageData>,
+    kind: String,
+    data: bson::Bson,
 }
 
 impl Message {
-    pub fn new<T: 'static + MessageData>(data: T) -> Message {
-        Message {
-            code: TypeId::of::<T>(),
-            data: Box::new(data),
-        }
+    pub fn new(kind: String, data: bson::Bson) -> Message {
+        Message { kind, data }
     }
 
-    pub fn code(&self) -> TypeId {
-        self.code
+    pub fn kind(&self) -> &str {
+        &self.kind
     }
 
-    pub fn data(&self) -> &dyn MessageData {
-        &*self.data
+    pub fn data(&self) -> &bson::Bson {
+        &self.data
     }
 }

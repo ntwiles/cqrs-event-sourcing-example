@@ -1,5 +1,3 @@
-use std::any::TypeId;
-
 use crate::infrastructure::persistence::events::EventsService;
 
 use super::handler::MessageHandler;
@@ -21,10 +19,10 @@ impl HandlerRegistry {
 
     pub fn get_handlers(
         &self,
-        message_type: TypeId,
+        message_kind: String,
     ) -> impl Iterator<Item = &Box<dyn MessageHandler>> + '_ {
         self.handlers
             .iter()
-            .filter(move |h| h.message_type() == message_type)
+            .filter(move |h| h.message_kind() == message_kind)
     }
 }

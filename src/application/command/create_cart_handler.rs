@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use futures::lock::Mutex;
 
-use std::{any::TypeId, sync::Arc};
+use std::sync::Arc;
 
 use crate::application::event::created_cart_event::CreatedCartEvent;
 use crate::infrastructure::message_bus::{
@@ -23,23 +23,18 @@ impl CreateCartCommandHandler {
 
 #[async_trait]
 impl MessageHandler for CreateCartCommandHandler {
-    fn message_type(&self) -> TypeId {
-        TypeId::of::<CreateCartCommand>()
+    fn message_kind(&self) -> String {
+        "createCart".to_string()
     }
 
     async fn handle(&self, message: &Message) {
-        let command = message
-            .data()
-            .as_any()
-            .downcast_ref::<CreateCartCommand>()
-            .unwrap();
-
-        let event = CreatedCartEvent {};
+        let command: CreateCartCommand = bson::from_bson(message.data().clone()).unwrap();
+        let event = bson::to_bson(&CreatedCartEvent {}).unwrap();
 
         self.message_queue
             .lock()
             .await
-            .raise_event(*command.customer_id(), event)
+            .raise_event(*command.customer_id(), "createdCart".to_string(), event)
             .await;
     }
 }

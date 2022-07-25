@@ -2,7 +2,6 @@ use bson::oid;
 
 use std::{collections::VecDeque, sync::Arc};
 
-use crate::infrastructure::message_bus::{event::EventData, message::MessageData};
 use crate::infrastructure::persistence::events::EventsService;
 
 use super::message::Message;
@@ -24,22 +23,25 @@ impl MessageQueue {
         self.queue.pop_front()
     }
 
-    pub fn send_command<T: 'static + MessageData>(&mut self, command: T) {
-        let message = Message::new(command);
+    pub fn send_command(&mut self, kind: String, command: bson::Bson) {
+        let message = Message::new(kind, command);
         self.send(message);
     }
 
-    pub async fn raise_event<T: 'static + MessageData + EventData>(
+    pub async fn raise_event(
         &mut self,
         correlation_id: oid::ObjectId,
-        event: T,
+        kind: String,
+        data: bson::Bson,
     ) {
-        self.event_store.write_event(correlation_id, event).await;
-        self.send(Message::new(event));
+        self.event_store
+            .write_event(correlation_id, kind.clone(), data.clone())
+            .await;
+        self.send(Message::new(kind, data));
     }
 
     fn send(&mut self, message: Message) {
-        println!("Sending message: {:?}", message.code());
+        println!("Sending message: {}", message.kind());
         self.queue.push_back(message);
     }
 }
