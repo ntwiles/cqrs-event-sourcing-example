@@ -23,9 +23,9 @@ pub struct Cart {
 }
 
 impl Cart {
-    pub fn items(&self) -> &Vec<Item> {
-        &self.items
-    }
+    // pub fn items(&self) -> &Vec<Item> {
+    //     &self.items
+    // }
 }
 
 impl Cart {
