@@ -1,8 +1,4 @@
-use std::{any::Any, fmt::Debug};
-
-pub trait MessageData: Debug + Send + Sync {
-    fn as_any(&self) -> &dyn Any;
-}
+use std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct Message {

@@ -1,9 +1,7 @@
 use bson::oid;
 use serde::{Deserialize, Serialize};
 
-use std::any::Any;
-
-use crate::infrastructure::message_bus::{event::EventData, message::MessageData};
+use crate::infrastructure::message_bus::event::EventData;
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct AddedToCartEvent {
@@ -25,12 +23,6 @@ impl AddedToCartEvent {
 
     pub fn quantity(&self) -> u8 {
         self.quantity
-    }
-}
-
-impl MessageData for AddedToCartEvent {
-    fn as_any(&self) -> &dyn Any {
-        self
     }
 }
 

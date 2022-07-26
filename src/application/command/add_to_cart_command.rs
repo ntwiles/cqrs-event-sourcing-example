@@ -1,10 +1,6 @@
 use bson::oid;
 use serde::{Deserialize, Serialize};
 
-use std::any::Any;
-
-use crate::infrastructure::message_bus::message::MessageData;
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AddToCartCommand {
     customer_id: oid::ObjectId,
@@ -23,11 +19,5 @@ impl AddToCartCommand {
 
     pub fn quantity(&self) -> &u8 {
         &self.quantity
-    }
-}
-
-impl MessageData for AddToCartCommand {
-    fn as_any(&self) -> &dyn Any {
-        self
     }
 }
