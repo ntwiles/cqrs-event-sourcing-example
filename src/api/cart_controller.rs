@@ -40,6 +40,5 @@ pub async fn read(
     Extension(cart_store): Extension<Arc<CartStore>>,
 ) -> impl IntoResponse {
     let result = cart_store.get(query.customer_id().clone()).await;
-    println!("Result: {:?}", result);
-    (StatusCode::OK, "a response!")
+    (StatusCode::OK, Json(result))
 }

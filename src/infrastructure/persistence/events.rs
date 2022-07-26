@@ -2,11 +2,11 @@ use bson::{doc, oid};
 use chrono::{offset::Utc, DateTime};
 use dotenv_codegen::dotenv;
 use mongodb::{options::ClientOptions, Client};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use std::fmt::Debug;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Event {
     data: bson::Bson,
     kind: String,
@@ -22,6 +22,14 @@ impl Event {
             kind,
             when: Utc::now(),
         }
+    }
+
+    pub fn data(&self) -> &bson::Bson {
+        &self.data
+    }
+
+    pub fn kind(&self) -> &str {
+        &self.kind
     }
 }
 

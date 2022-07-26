@@ -3,7 +3,8 @@ use mongodb::Cursor;
 
 use std::sync::Arc;
 
-use crate::domain::cart::Cart;
+use crate::application::event::added_to_cart_event::AddedToCartEvent;
+use crate::domain::cart::{Cart, Item};
 use crate::infrastructure::persistence::events::{Event, EventService};
 
 pub struct CartStore {
@@ -21,17 +22,17 @@ impl CartStore {
     }
 
     async fn replay(mut events: Cursor<Event>) -> Result<Cart, mongodb::error::Error> {
-        let mut items = Vec::<String>::new();
+        let mut items = Vec::<Item>::new();
 
         while events.advance().await? {
-            let event = events.current();
-            let kind = event.get_str("kind").unwrap();
+            let event = events.deserialize_current().unwrap();
 
-            println!("{}", kind);
-
-            match kind {
+            match event.kind() {
                 "createdCart" => (),
-                "addedToCart" => items.push("test".to_string()),
+                "addedToCart" => {
+                    let data = bson::from_bson::<AddedToCartEvent>(event.data().clone()).unwrap();
+                    items.push(Item::new(&data.offering_id().to_string(), data.quantity()));
+                }
                 _ => panic!(),
             }
         }

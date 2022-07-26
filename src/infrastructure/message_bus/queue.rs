@@ -23,6 +23,7 @@ impl MessageQueue {
         self.queue.pop_front()
     }
 
+    // TODO: Find a solution that isn't "stringly typed".
     pub fn send_command(&mut self, kind: String, command: bson::Bson) {
         let message = Message::new(kind, command);
         self.send(message);
