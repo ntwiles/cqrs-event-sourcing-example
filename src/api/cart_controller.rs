@@ -9,7 +9,7 @@ use crate::application::{
 };
 use crate::infrastructure::message_bus::queue::MessageQueue;
 
-pub async fn create<'a>(
+pub async fn create(
     Json(command): Json<CreateCartCommand>,
     Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
 ) -> impl IntoResponse {
