@@ -5,9 +5,9 @@ use std::sync::Arc;
 
 use crate::application::{
     command::{add_to_cart_command::AddToCartCommand, create_cart_command::CreateCartCommand},
-    query::{cart_query::CartQuery, cart_store::CartStore},
+    query::cart_query::CartQuery,
 };
-use crate::infrastructure::message_bus::queue::MessageQueue;
+use crate::infrastructure::{message_bus::queue::MessageQueue, read_stores::cart::CartStore};
 
 pub async fn create(
     Json(command): Json<CreateCartCommand>,
