@@ -39,6 +39,6 @@ pub async fn read(
     Json(query): Json<CartQuery>,
     Extension(cart_store): Extension<Arc<CartStore>>,
 ) -> impl IntoResponse {
-    let result = cart_store.get(query.customer_id().clone()).await;
+    let result = cart_store.get(query.cart_id().clone()).await;
     (StatusCode::OK, Json(result))
 }
