@@ -6,16 +6,18 @@ use serde::{Deserialize, Serialize};
 
 use std::fmt::Debug;
 
+use crate::infrastructure::message_bus::event_kind::EventKind;
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Event {
     data: bson::Bson,
-    kind: String,
+    kind: EventKind,
     correlation_id: oid::ObjectId,
     when: DateTime<Utc>,
 }
 
 impl Event {
-    pub fn new(correlation_id: oid::ObjectId, kind: String, data: bson::Bson) -> Event {
+    pub fn new(correlation_id: oid::ObjectId, kind: EventKind, data: bson::Bson) -> Event {
         Event {
             correlation_id,
             data,
@@ -28,7 +30,7 @@ impl Event {
         &self.data
     }
 
-    pub fn kind(&self) -> &str {
+    pub fn kind(&self) -> &EventKind {
         &self.kind
     }
 }
@@ -54,7 +56,12 @@ impl EventService {
         self.db.collection::<Event>("events")
     }
 
-    pub async fn write_event(&self, correlation_id: oid::ObjectId, kind: String, data: bson::Bson) {
+    pub async fn write_event(
+        &self,
+        correlation_id: oid::ObjectId,
+        kind: EventKind,
+        data: bson::Bson,
+    ) {
         println!("Writing event!");
 
         let event = Event::new(correlation_id, kind, data);

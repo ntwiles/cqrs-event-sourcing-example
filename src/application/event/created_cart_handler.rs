@@ -1,6 +1,10 @@
 use async_trait::async_trait;
 
-use crate::infrastructure::message_bus::{handler::MessageHandler, message::Message};
+use crate::infrastructure::message_bus::{
+    event_kind::EventKind,
+    handler::MessageHandler,
+    message::{Message, MessageKind},
+};
 
 #[derive(Clone)]
 pub struct CreatedCartEventHandler {}
@@ -13,8 +17,8 @@ impl CreatedCartEventHandler {
 
 #[async_trait]
 impl MessageHandler for CreatedCartEventHandler {
-    fn message_kind(&self) -> String {
-        "createdCart".to_string()
+    fn message_kind(&self) -> MessageKind {
+        MessageKind::Event(EventKind::CreatedCart)
     }
 
     async fn handle(&self, _message: &Message) -> () {

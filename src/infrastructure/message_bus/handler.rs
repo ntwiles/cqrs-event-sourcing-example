@@ -1,10 +1,9 @@
 use async_trait::async_trait;
 
-use super::message::Message;
+use super::message::{Message, MessageKind};
 
 #[async_trait]
 pub trait MessageHandler: Send + Sync {
-    // TODO: Find a solution that isn't "stringly typed".
-    fn message_kind(&self) -> String;
+    fn message_kind(&self) -> MessageKind;
     async fn handle(&self, message: &Message);
 }

@@ -5,7 +5,11 @@ use std::sync::Arc;
 
 use crate::application::event::added_to_cart_event::AddedToCartEvent;
 use crate::infrastructure::message_bus::{
-    handler::MessageHandler, message::Message, queue::MessageQueue,
+    command_kind::CommandKind,
+    event_kind::EventKind,
+    handler::MessageHandler,
+    message::{Message, MessageKind},
+    queue::MessageQueue,
 };
 
 use super::add_to_cart_command::AddToCartCommand;
@@ -22,8 +26,8 @@ impl AddToCartCommandHandler {
 
 #[async_trait]
 impl MessageHandler for AddToCartCommandHandler {
-    fn message_kind(&self) -> String {
-        "addToCart".to_string()
+    fn message_kind(&self) -> MessageKind {
+        MessageKind::Command(CommandKind::AddToCart)
     }
 
     async fn handle(&self, message: &Message) -> () {
@@ -37,7 +41,7 @@ impl MessageHandler for AddToCartCommandHandler {
         self.message_queue
             .lock()
             .await
-            .raise_event(*command.customer_id(), "addedToCart".to_string(), data)
+            .raise_event(*command.customer_id(), EventKind::AddedToCart, data)
             .await
     }
 }

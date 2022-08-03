@@ -6,7 +6,10 @@ use std::sync::Arc;
 
 use crate::application::event::added_to_cart_event::AddedToCartEvent;
 use crate::domain::cart::{Cart, Item};
-use crate::infrastructure::persistence::events::{Event, EventService};
+use crate::infrastructure::{
+    message_bus::event_kind::EventKind,
+    persistence::events::{Event, EventService},
+};
 
 use super::replay::Replay;
 
@@ -18,8 +21,9 @@ impl CartStore {
     pub fn new(event_service: Arc<EventService>) -> CartStore {
         CartStore { event_service }
     }
-    pub async fn get(&self, customer_id: oid::ObjectId) -> Cart {
-        let events = self.event_service.find_events(customer_id).await.unwrap();
+
+    pub async fn get(&self, cart_id: oid::ObjectId) -> Cart {
+        let events = self.event_service.find_events(cart_id).await.unwrap();
 
         CartStore::replay(events).await.unwrap()
     }
@@ -31,15 +35,14 @@ impl Replay<Cart> for CartStore {
         let mut items = Vec::<Item>::new();
 
         while events.advance().await? {
-            let event = events.deserialize_current().unwrap();
+            let event = events.deserialize_current()?;
 
             match event.kind() {
-                "createdCart" => (),
-                "addedToCart" => {
-                    let data = bson::from_bson::<AddedToCartEvent>(event.data().clone()).unwrap();
+                EventKind::CreatedCart => (),
+                EventKind::AddedToCart => {
+                    let data = bson::from_bson::<AddedToCartEvent>(event.data().clone())?;
                     items.push(Item::new(&data.offering_id().to_string(), data.quantity()));
                 }
-                _ => panic!(),
             }
         }
 

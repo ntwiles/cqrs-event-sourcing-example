@@ -1,6 +1,6 @@
 use crate::infrastructure::persistence::events::EventService;
 
-use super::handler::MessageHandler;
+use super::{handler::MessageHandler, message::MessageKind};
 
 pub struct HandlerRegistry {
     handlers: Vec<Box<dyn MessageHandler>>,
@@ -19,7 +19,7 @@ impl HandlerRegistry {
 
     pub fn get_handlers(
         &self,
-        message_kind: String,
+        message_kind: MessageKind,
     ) -> impl Iterator<Item = &Box<dyn MessageHandler>> + '_ {
         self.handlers
             .iter()

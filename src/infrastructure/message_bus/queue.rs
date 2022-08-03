@@ -4,7 +4,11 @@ use std::{collections::VecDeque, sync::Arc};
 
 use crate::infrastructure::persistence::events::EventService;
 
-use super::message::Message;
+use super::{
+    command_kind::CommandKind,
+    event_kind::EventKind,
+    message::{Message, MessageKind},
+};
 
 pub struct MessageQueue {
     queue: VecDeque<Message>,
@@ -23,26 +27,25 @@ impl MessageQueue {
         self.queue.pop_front()
     }
 
-    // TODO: Find a solution that isn't "stringly typed".
-    pub fn send_command(&mut self, kind: String, command: bson::Bson) {
-        let message = Message::new(kind, command);
+    pub fn send_command(&mut self, kind: CommandKind, command: bson::Bson) {
+        let message = Message::new(MessageKind::Command(kind), command);
         self.send(message);
     }
 
     pub async fn raise_event(
         &mut self,
         correlation_id: oid::ObjectId,
-        kind: String,
+        kind: EventKind,
         data: bson::Bson,
     ) {
         self.event_store
             .write_event(correlation_id, kind.clone(), data.clone())
             .await;
-        self.send(Message::new(kind, data));
+        self.send(Message::new(MessageKind::Event(kind), data));
     }
 
     fn send(&mut self, message: Message) {
-        println!("Sending message: {}", message.kind());
+        println!("Sending message: {:?}", message.kind());
         self.queue.push_back(message);
     }
 }

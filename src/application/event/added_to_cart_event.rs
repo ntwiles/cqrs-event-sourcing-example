@@ -1,8 +1,6 @@
 use bson::oid;
 use serde::{Deserialize, Serialize};
 
-use crate::infrastructure::message_bus::event::EventData;
-
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct AddedToCartEvent {
     offering_id: oid::ObjectId,
@@ -23,11 +21,5 @@ impl AddedToCartEvent {
 
     pub fn quantity(&self) -> u8 {
         self.quantity
-    }
-}
-
-impl EventData for AddedToCartEvent {
-    fn kind(&self) -> String {
-        "addedToCart".to_string()
     }
 }

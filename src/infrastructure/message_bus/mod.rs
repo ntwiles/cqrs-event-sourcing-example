@@ -1,4 +1,5 @@
-pub mod event;
+pub mod command_kind;
+pub mod event_kind;
 pub mod handler;
 pub mod message;
 pub mod queue;
@@ -18,7 +19,7 @@ pub fn start_message_loop(queue: Arc<Mutex<MessageQueue>>, registry: HandlerRegi
             let message = queue.lock().await.pop_queue();
 
             if let Some(message) = message {
-                let handlers = registry.get_handlers(message.kind().to_string());
+                let handlers = registry.get_handlers(message.kind());
 
                 for handler in handlers {
                     handler.handle(&message).await;
