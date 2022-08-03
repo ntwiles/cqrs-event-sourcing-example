@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use bson::oid;
 use mongodb::Cursor;
 
@@ -6,6 +7,8 @@ use std::sync::Arc;
 use crate::application::event::added_to_cart_event::AddedToCartEvent;
 use crate::domain::cart::{Cart, Item};
 use crate::infrastructure::persistence::events::{Event, EventService};
+
+use super::replay::Replay;
 
 pub struct CartStore {
     event_service: Arc<EventService>,
@@ -20,7 +23,10 @@ impl CartStore {
 
         CartStore::replay(events).await.unwrap()
     }
+}
 
+#[async_trait]
+impl Replay<Cart> for CartStore {
     async fn replay(mut events: Cursor<Event>) -> Result<Cart, mongodb::error::Error> {
         let mut items = Vec::<Item>::new();
 
