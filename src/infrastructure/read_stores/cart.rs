@@ -22,10 +22,9 @@ impl CartStore {
         CartStore { event_service }
     }
 
-    pub async fn get(&self, cart_id: oid::ObjectId) -> Cart {
-        let events = self.event_service.find_events(cart_id).await.unwrap();
-
-        CartStore::replay(events).await.unwrap()
+    pub async fn get(&self, cart_id: oid::ObjectId) -> Result<Cart, mongodb::error::Error> {
+        let events = self.event_service.find_events(cart_id).await?;
+        CartStore::replay(events).await
     }
 }
 
