@@ -31,7 +31,7 @@ impl CartStore {
 #[async_trait]
 impl Replay<Cart> for CartStore {
     async fn replay(mut events: Cursor<Event>) -> Result<Cart, mongodb::error::Error> {
-        let mut items = Vec::<Item>::new();
+        let mut cart = Cart::new();
 
         while events.advance().await? {
             let event = events.deserialize_current()?;
@@ -39,7 +39,8 @@ impl Replay<Cart> for CartStore {
             match event.kind() {
                 EventKind::CartItemAdded => {
                     let data = bson::from_bson::<CartItemAddedEvent>(event.data().clone())?;
-                    items.push(Item::new(&data.offering_id().to_string(), data.quantity()));
+                    cart.items
+                        .push(Item::new(&data.offering_id().to_string(), data.quantity()));
                 }
                 k => panic!(
                     "Events of kind {:?} should not be correlated with cart_id {}.",
@@ -49,6 +50,6 @@ impl Replay<Cart> for CartStore {
             }
         }
 
-        Ok(Cart::new(items))
+        Ok(cart)
     }
 }

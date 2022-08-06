@@ -4,8 +4,12 @@ use mongodb::Cursor;
 
 use std::sync::Arc;
 
+use crate::application::event::user_cart_created_event::UserCartCreatedEvent;
 use crate::domain::user::User;
-use crate::infrastructure::persistence::events::{Event, EventService};
+use crate::infrastructure::{
+    message_bus::event_kind::EventKind,
+    persistence::events::{Event, EventService},
+};
 
 use super::replay::Replay;
 
@@ -27,13 +31,21 @@ impl UserStore {
 #[async_trait]
 impl Replay<User> for UserStore {
     async fn replay(mut events: Cursor<Event>) -> Result<User, mongodb::error::Error> {
-        let user = User::new();
+        let mut user = User::new();
 
         while events.advance().await? {
             let event = events.deserialize_current()?;
 
             match event.kind() {
-                _ => todo!(),
+                EventKind::UserCartCreated => {
+                    let data = bson::from_bson::<UserCartCreatedEvent>(event.data().clone())?;
+                    user.current_cart = Some(data.cart_id());
+                }
+                k => panic!(
+                    "Events of kind {:?} should not be correlated with user_id {}.",
+                    k,
+                    event.correlation_id()
+                ),
             }
         }
 

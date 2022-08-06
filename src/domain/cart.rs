@@ -19,17 +19,11 @@ impl Item {
 
 #[derive(Debug, Serialize)]
 pub struct Cart {
-    items: Vec<Item>,
+    pub items: Vec<Item>,
 }
 
 impl Cart {
-    // pub fn items(&self) -> &Vec<Item> {
-    //     &self.items
-    // }
-}
-
-impl Cart {
-    pub fn new(items: Vec<Item>) -> Cart {
-        Cart { items }
+    pub fn new() -> Cart {
+        Cart { items: Vec::new() }
     }
 }

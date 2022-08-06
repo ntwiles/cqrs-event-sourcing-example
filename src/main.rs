@@ -50,7 +50,7 @@ async fn main() {
     start_message_loop(bus.clone(), registry);
 
     let app = Router::new()
-        .route("/cart/:cart_id", get(cart_controller::read))
+        .route("/cart", get(cart_controller::read))
         .route("/cart", post(cart_controller::update))
         .route("/user/:user_id", get(user_controller::read))
         .layer(Extension(bus))

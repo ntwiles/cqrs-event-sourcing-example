@@ -36,14 +36,14 @@ pub async fn update(
         .await
         .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
-    let cart_id = customer.current_cart().unwrap_or(oid::ObjectId::new());
+    let cart_id = customer.current_cart.unwrap_or(oid::ObjectId::new());
 
-    if customer.current_cart().is_none() {
+    if customer.current_cart.is_none() {
         raise_cart_created_event(user_id, cart_id, messsage_queue.clone()).await;
     };
 
     let command = CartAddItemCommand {
-        cart_id: customer.current_cart().unwrap_or(oid::ObjectId::new()),
+        cart_id,
         offering_id: req.offering_id,
         quantity: req.quantity,
     };
@@ -70,14 +70,14 @@ pub async fn read(
         .await
         .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
-    if let Some(cart_id) = customer.current_cart() {
+    if let Some(cart_id) = customer.current_cart {
         cart_store
             .get(cart_id)
             .await
             .map(|c| Json(c))
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
     } else {
-        Err(StatusCode::INTERNAL_SERVER_ERROR)
+        Err(StatusCode::NOT_FOUND)
     }
 }
 
