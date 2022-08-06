@@ -3,9 +3,9 @@ use futures::lock::Mutex;
 
 use std::sync::Arc;
 
-use crate::application::event::added_to_cart_event::AddedToCartEvent;
-use crate::infrastructure::message_bus::{
-    handler::MessageHandler, message::Message, queue::MessageQueue,
+use crate::{
+    application::event::added_to_cart_event::AddedToCartEvent,
+    infrastructure::message_bus::{handler::MessageHandler, message::Message, queue::MessageQueue},
 };
 
 use super::add_to_cart_command::AddToCartCommand;

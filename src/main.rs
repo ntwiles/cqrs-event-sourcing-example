@@ -52,7 +52,7 @@ async fn main() {
     start_message_loop(queue.clone(), registry);
 
     let app = Router::new()
-        .route("/cart", get(cart_controller::read))
+        .route("/cart/:cart_id", get(cart_controller::read))
         .route("/cart", post(cart_controller::create))
         .route("/cart", patch(cart_controller::update))
         .layer(Extension(queue))
