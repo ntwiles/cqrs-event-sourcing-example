@@ -3,7 +3,7 @@ use serde::Serialize;
 
 #[derive(Debug, Serialize)]
 pub struct User {
-    curent_cart: Option<oid::ObjectId>,
+    current_cart: Option<oid::ObjectId>,
     first_name: String,
     last_name: String,
 }
@@ -11,9 +11,13 @@ pub struct User {
 impl User {
     pub fn new() -> Self {
         User {
-            curent_cart: None,
+            current_cart: None,
             first_name: String::new(),
             last_name: String::new(),
         }
+    }
+
+    pub fn current_cart(&self) -> Option<oid::ObjectId> {
+        self.current_cart.clone()
     }
 }

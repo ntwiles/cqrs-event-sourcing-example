@@ -1,5 +1,5 @@
 use axum::{
-    routing::{get, patch, post},
+    routing::{get, post},
     Extension, Router,
 };
 use dotenv::dotenv;
@@ -10,10 +10,7 @@ use std::{net::SocketAddr, sync::Arc};
 use crate::{
     api::{cart_controller, user_controller},
     application::{
-        command::{
-            add_to_cart_handler::AddToCartCommandHandler,
-            create_cart_handler::CreateCartCommandHandler,
-        },
+        command::cart_add_item_handler::CartAddItemHandler,
         event::{
             cart_item_added_handler::CartItemAddedHandler,
             user_cart_created_handler::UserCartCreatedHandler,
@@ -40,29 +37,23 @@ async fn main() {
     let cart_store = Arc::new(CartStore::new(events_service.clone()));
     let user_store = Arc::new(UserStore::new(events_service.clone()));
 
-    let message_queue = Arc::new(Mutex::new(MessageQueue::new(events_service.clone())));
+    let bus = Arc::new(Mutex::new(MessageQueue::new(events_service.clone())));
     let mut registry = HandlerRegistry::new(&events_service);
 
     // commands
-    registry.add(Box::new(AddToCartCommandHandler::new(
-        message_queue.clone(),
-    )));
-    registry.add(Box::new(CreateCartCommandHandler::new(
-        message_queue.clone(),
-    )));
+    registry.add(Box::new(CartAddItemHandler::new(bus.clone())));
 
     // events
     registry.add(Box::new(CartItemAddedHandler::new()));
     registry.add(Box::new(UserCartCreatedHandler::new()));
 
-    start_message_loop(message_queue.clone(), registry);
+    start_message_loop(bus.clone(), registry);
 
     let app = Router::new()
         .route("/cart/:cart_id", get(cart_controller::read))
-        .route("/cart", post(cart_controller::create))
-        .route("/cart", patch(cart_controller::update))
+        .route("/cart", post(cart_controller::update))
         .route("/user/:user_id", get(user_controller::read))
-        .layer(Extension(message_queue))
+        .layer(Extension(bus))
         .layer(Extension(cart_store))
         .layer(Extension(user_store));
 

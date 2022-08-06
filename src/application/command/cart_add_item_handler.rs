@@ -14,36 +14,35 @@ use crate::{
     },
 };
 
-use super::add_to_cart_command::AddToCartCommand;
+use super::cart_add_item_command::CartAddItemCommand;
 
-pub struct AddToCartCommandHandler {
+pub struct CartAddItemHandler {
     message_queue: Arc<Mutex<MessageQueue>>,
 }
 
-impl AddToCartCommandHandler {
-    pub fn new(message_queue: Arc<Mutex<MessageQueue>>) -> AddToCartCommandHandler {
-        AddToCartCommandHandler { message_queue }
+impl CartAddItemHandler {
+    pub fn new(message_queue: Arc<Mutex<MessageQueue>>) -> Self {
+        Self { message_queue }
     }
 }
 
 #[async_trait]
-impl MessageHandler for AddToCartCommandHandler {
+impl MessageHandler for CartAddItemHandler {
     fn message_kind(&self) -> MessageKind {
         MessageKind::Command(CommandKind::AddToCart)
     }
 
     async fn handle(&self, message: &Message) -> () {
-        let command: AddToCartCommand = bson::from_bson(message.data().clone()).unwrap();
+        let command: CartAddItemCommand = bson::from_bson(message.data().clone()).unwrap();
 
-        let event =
-            CartItemAddedEvent::new(command.offering_id().clone(), command.quantity().clone());
+        let event = CartItemAddedEvent::new(command.offering_id, command.quantity);
 
         let data = bson::to_bson(&event).unwrap();
 
         self.message_queue
             .lock()
             .await
-            .raise_event(*command.customer_id(), EventKind::CartItemAdded, data)
+            .raise_event(command.cart_id, EventKind::CartItemAdded, data)
             .await
     }
 }
