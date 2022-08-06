@@ -15,8 +15,8 @@ use crate::{
             create_cart_handler::CreateCartCommandHandler,
         },
         event::{
-            added_to_cart_handler::AddedToCartEventHandler,
-            created_cart_handler::CreatedCartEventHandler,
+            cart_item_added_handler::CartItemAddedHandler,
+            user_cart_created_handler::UserCartCreatedHandler,
         },
         query::{cart::CartStore, user::UserStore},
     },
@@ -52,8 +52,8 @@ async fn main() {
     )));
 
     // events
-    registry.add(Box::new(AddedToCartEventHandler::new()));
-    registry.add(Box::new(CreatedCartEventHandler::new()));
+    registry.add(Box::new(CartItemAddedHandler::new()));
+    registry.add(Box::new(UserCartCreatedHandler::new()));
 
     start_message_loop(message_queue.clone(), registry);
 

@@ -7,18 +7,18 @@ use crate::infrastructure::message_bus::{
 };
 
 #[derive(Clone)]
-pub struct AddedToCartEventHandler {}
+pub struct CartItemAddedHandler {}
 
-impl AddedToCartEventHandler {
-    pub fn new() -> AddedToCartEventHandler {
-        AddedToCartEventHandler {}
+impl CartItemAddedHandler {
+    pub fn new() -> Self {
+        Self {}
     }
 }
 
 #[async_trait]
-impl MessageHandler for AddedToCartEventHandler {
+impl MessageHandler for CartItemAddedHandler {
     fn message_kind(&self) -> MessageKind {
-        MessageKind::Event(EventKind::AddedToCart)
+        MessageKind::Event(EventKind::CartItemAdded)
     }
 
     async fn handle(&self, _message: &Message) -> () {

@@ -2,14 +2,14 @@ use bson::oid;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
-pub struct AddedToCartEvent {
+pub struct CartItemAddedEvent {
     offering_id: oid::ObjectId,
     quantity: u8,
 }
 
-impl AddedToCartEvent {
-    pub fn new(offering_id: oid::ObjectId, quantity: u8) -> AddedToCartEvent {
-        AddedToCartEvent {
+impl CartItemAddedEvent {
+    pub fn new(offering_id: oid::ObjectId, quantity: u8) -> Self {
+        Self {
             offering_id,
             quantity,
         }

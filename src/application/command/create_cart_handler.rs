@@ -4,7 +4,7 @@ use futures::lock::Mutex;
 use std::sync::Arc;
 
 use crate::{
-    application::event::created_cart_event::CreatedCartEvent,
+    application::event::user_cart_created_event::UserCartCreatedEvent,
     infrastructure::message_bus::{
         command_kind::CommandKind,
         event_kind::EventKind,
@@ -36,12 +36,12 @@ impl MessageHandler for CreateCartCommandHandler {
 
     async fn handle(&self, message: &Message) {
         let command: CreateCartCommand = bson::from_bson(message.data().clone()).unwrap();
-        let event = bson::to_bson(&CreatedCartEvent {}).unwrap();
+        let event = bson::to_bson(&UserCartCreatedEvent {}).unwrap();
 
         self.message_queue
             .lock()
             .await
-            .raise_event(*command.customer_id(), EventKind::CreatedCart, event)
+            .raise_event(*command.customer_id(), EventKind::UserCartCreated, event)
             .await;
     }
 }

@@ -4,7 +4,7 @@ use mongodb::Cursor;
 
 use std::sync::Arc;
 
-use crate::application::event::added_to_cart_event::AddedToCartEvent;
+use crate::application::event::cart_item_added_event::CartItemAddedEvent;
 use crate::domain::cart::{Cart, Item};
 use crate::infrastructure::{
     message_bus::event_kind::EventKind,
@@ -37,11 +37,15 @@ impl Replay<Cart> for CartStore {
             let event = events.deserialize_current()?;
 
             match event.kind() {
-                EventKind::CreatedCart => (),
-                EventKind::AddedToCart => {
-                    let data = bson::from_bson::<AddedToCartEvent>(event.data().clone())?;
+                EventKind::CartItemAdded => {
+                    let data = bson::from_bson::<CartItemAddedEvent>(event.data().clone())?;
                     items.push(Item::new(&data.offering_id().to_string(), data.quantity()));
                 }
+                k => panic!(
+                    "Events of kind {:?} should not be correlated with cart_id {}.",
+                    k,
+                    event.correlation_id()
+                ),
             }
         }
 

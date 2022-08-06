@@ -26,6 +26,10 @@ impl Event {
         }
     }
 
+    pub fn correlation_id(&self) -> oid::ObjectId {
+        self.correlation_id
+    }
+
     pub fn data(&self) -> &bson::Bson {
         &self.data
     }
