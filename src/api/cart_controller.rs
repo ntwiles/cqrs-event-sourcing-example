@@ -1,4 +1,4 @@
-use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Json};
+use axum::{extract::Path, http::StatusCode, Extension, Json};
 use bson::oid;
 use futures::lock::Mutex;
 
@@ -18,29 +18,29 @@ use crate::{
 pub async fn create(
     Json(command): Json<CreateCartCommand>,
     Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
-) -> impl IntoResponse {
-    let data = bson::to_bson(&command).unwrap();
+) -> Result<StatusCode, StatusCode> {
+    let data = bson::to_bson(&command).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     messsage_queue
         .lock()
         .await
         .send_command(CommandKind::CreateCart, data);
 
-    return StatusCode::CREATED;
+    Ok(StatusCode::CREATED)
 }
 
 pub async fn update(
     Json(command): Json<AddToCartCommand>,
     Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
-) -> impl IntoResponse {
-    let data = bson::to_bson(&command).unwrap();
+) -> Result<StatusCode, StatusCode> {
+    let data = bson::to_bson(&command).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     messsage_queue
         .lock()
         .await
         .send_command(CommandKind::AddToCart, data);
 
-    StatusCode::OK
+    Ok(StatusCode::OK)
 }
 
 pub async fn read(
