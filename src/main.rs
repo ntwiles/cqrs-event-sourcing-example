@@ -18,11 +18,11 @@ use crate::{
             added_to_cart_handler::AddedToCartEventHandler,
             created_cart_handler::CreatedCartEventHandler,
         },
+        query::cart::CartStore,
     },
     infrastructure::{
         message_bus::{queue::MessageQueue, registry::HandlerRegistry, start_message_loop},
         persistence::events::EventService,
-        read_stores::cart::CartStore,
     },
 };
 

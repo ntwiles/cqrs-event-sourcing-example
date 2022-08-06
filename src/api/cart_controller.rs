@@ -5,14 +5,12 @@ use futures::lock::Mutex;
 use std::sync::Arc;
 
 use crate::{
-    application::command::{
-        add_to_cart_command::AddToCartCommand, create_cart_command::CreateCartCommand,
+    application::{
+        command::{add_to_cart_command::AddToCartCommand, create_cart_command::CreateCartCommand},
+        query::cart::CartStore,
     },
     domain::cart::Cart,
-    infrastructure::{
-        message_bus::{command_kind::CommandKind, queue::MessageQueue},
-        read_stores::cart::CartStore,
-    },
+    infrastructure::message_bus::{command_kind::CommandKind, queue::MessageQueue},
 };
 
 pub async fn create(
