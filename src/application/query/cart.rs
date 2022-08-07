@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use bson::oid;
+use futures::TryStreamExt;
 use mongodb::Cursor;
 
 use std::sync::Arc;
@@ -26,6 +27,18 @@ impl CartStore {
         let events = self.event_service.find_events(cart_id).await?;
         Self::replay(events).await
     }
+
+    pub async fn get_raw(
+        &self,
+        cart_id: oid::ObjectId,
+    ) -> Result<Vec<Event>, mongodb::error::Error> {
+        let result = self.event_service.find_events(cart_id).await;
+
+        match result {
+            Ok(cursor) => cursor.try_collect().await,
+            Err(e) => Err(e),
+        }
+    }
 }
 
 #[async_trait]
@@ -39,8 +52,7 @@ impl Replay<Cart> for CartStore {
             match event.kind() {
                 EventKind::CartItemAdded => {
                     let data = bson::from_bson::<CartItemAddedEvent>(event.data().clone())?;
-                    cart.items
-                        .push(Item::new(&data.offering_id().to_string(), data.quantity()));
+                    cart.items.push(Item::new(data.product, data.quantity));
                 }
                 k => panic!(
                     "Events of kind {:?} should not be correlated with cart_id {}.",

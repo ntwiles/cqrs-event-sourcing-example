@@ -1,25 +1,15 @@
-use bson::oid;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+use crate::domain::product::Product;
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct CartItemAddedEvent {
-    offering_id: oid::ObjectId,
-    quantity: u8,
+    pub product: Product,
+    pub quantity: u8,
 }
 
 impl CartItemAddedEvent {
-    pub fn new(offering_id: oid::ObjectId, quantity: u8) -> Self {
-        Self {
-            offering_id,
-            quantity,
-        }
-    }
-
-    pub fn offering_id(&self) -> oid::ObjectId {
-        self.offering_id
-    }
-
-    pub fn quantity(&self) -> u8 {
-        self.quantity
+    pub fn new(product: Product, quantity: u8) -> Self {
+        Self { product, quantity }
     }
 }

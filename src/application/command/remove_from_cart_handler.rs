@@ -29,8 +29,7 @@ impl MessageHandler for RemoveFromCartCommandHandler {
     async fn handle(&self, message: &Message) -> () {
         let command: RemoveFromCartCommand = bson::from_bson(message.data().clone()).unwrap();
 
-        let event =
-            AddedToCartEvent::new(command.offering_id().clone(), command.quantity().clone());
+        let event = AddedToCartEvent::new(command.product_id().clone(), command.quantity().clone());
 
         let data = bson::to_bson(&event).unwrap();
 

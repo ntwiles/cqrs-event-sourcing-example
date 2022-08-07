@@ -19,7 +19,7 @@ use crate::{
 
 #[derive(Deserialize)]
 pub struct CartUpdateRequestBody {
-    offering_id: oid::ObjectId,
+    product_id: oid::ObjectId,
     quantity: u8,
 }
 
@@ -44,7 +44,7 @@ pub async fn update(
 
     let command = CartAddItemCommand {
         cart_id,
-        offering_id: req.offering_id,
+        product_id: req.product_id,
         quantity: req.quantity,
     };
 

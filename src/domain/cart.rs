@@ -1,19 +1,16 @@
 use serde::Serialize;
 
-// use super::offering::Offering;
+use super::product::Product;
 
 #[derive(Debug, Serialize)]
 pub struct Item {
-    offering: String, // TODO: Offering instead of String
+    product: Product,
     quantity: u8,
 }
 
 impl Item {
-    pub fn new(offering: &str, quantity: u8) -> Item {
-        Item {
-            offering: String::from(offering),
-            quantity,
-        }
+    pub fn new(product: Product, quantity: u8) -> Item {
+        Item { product, quantity }
     }
 }
 

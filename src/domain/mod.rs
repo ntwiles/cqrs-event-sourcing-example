@@ -1,4 +1,3 @@
 pub mod cart;
-pub mod offering;
-pub mod partner;
+pub mod product;
 pub mod user;

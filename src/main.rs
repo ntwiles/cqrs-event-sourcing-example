@@ -1,25 +1,27 @@
 use axum::{
+    http::Method,
     routing::{get, post},
     Extension, Router,
 };
 use dotenv::dotenv;
 use futures::lock::Mutex;
+use tower_http::cors::{Any, CorsLayer};
 
 use std::{net::SocketAddr, sync::Arc};
 
 use crate::{
-    api::{cart_controller, user_controller},
+    api::{cart_controller, cart_events_controller, product_controller, user_controller},
     application::{
         command::cart_add_item_handler::CartAddItemHandler,
         event::{
             cart_item_added_handler::CartItemAddedHandler,
             user_cart_created_handler::UserCartCreatedHandler,
         },
-        query::{cart::CartStore, user::UserStore},
+        query::{cart::CartStore, product::ProductStore, user::UserStore},
     },
     infrastructure::{
         message_bus::{queue::MessageQueue, registry::HandlerRegistry, start_message_loop},
-        persistence::events::EventService,
+        persistence::{events::EventService, products::ProductService},
     },
 };
 
@@ -32,16 +34,21 @@ mod infrastructure;
 async fn main() {
     dotenv().ok();
 
-    let events_service = Arc::new(EventService::new().await);
+    let event_service = Arc::new(EventService::new().await);
+    let product_service = Arc::new(ProductService::new().await);
 
-    let cart_store = Arc::new(CartStore::new(events_service.clone()));
-    let user_store = Arc::new(UserStore::new(events_service.clone()));
+    let cart_store = Arc::new(CartStore::new(event_service.clone()));
+    let product_store = Arc::new(ProductStore::new(product_service.clone()));
+    let user_store = Arc::new(UserStore::new(event_service.clone()));
 
-    let bus = Arc::new(Mutex::new(MessageQueue::new(events_service.clone())));
-    let mut registry = HandlerRegistry::new(&events_service);
+    let bus = Arc::new(Mutex::new(MessageQueue::new(event_service.clone())));
+    let mut registry = HandlerRegistry::new(&event_service);
 
     // commands
-    registry.add(Box::new(CartAddItemHandler::new(bus.clone())));
+    registry.add(Box::new(CartAddItemHandler::new(
+        bus.clone(),
+        product_store.clone(),
+    )));
 
     // events
     registry.add(Box::new(CartItemAddedHandler::new()));
@@ -49,13 +56,23 @@ async fn main() {
 
     start_message_loop(bus.clone(), registry);
 
+    let cors = CorsLayer::new()
+        // allow `GET` and `POST` when accessing the resource
+        .allow_methods([Method::GET, Method::POST])
+        // allow requests from any origin
+        .allow_origin(Any);
+
     let app = Router::new()
         .route("/cart", get(cart_controller::read))
         .route("/cart", post(cart_controller::update))
+        .route("/cart-events", get(cart_events_controller::read))
+        .route("/products", get(product_controller::read))
         .route("/user/:user_id", get(user_controller::read))
+        .layer(cors)
         .layer(Extension(bus))
         .layer(Extension(cart_store))
-        .layer(Extension(user_store));
+        .layer(Extension(user_store))
+        .layer(Extension(product_store));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
