@@ -18,6 +18,7 @@ use crate::{
 };
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CartUpdateRequestBody {
     product_id: oid::ObjectId,
     quantity: u8,

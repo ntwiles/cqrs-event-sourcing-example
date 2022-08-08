@@ -4,8 +4,8 @@ use super::product::Product;
 
 #[derive(Debug, Serialize)]
 pub struct Item {
-    product: Product,
-    quantity: u8,
+    pub product: Product,
+    pub quantity: u8,
 }
 
 impl Item {

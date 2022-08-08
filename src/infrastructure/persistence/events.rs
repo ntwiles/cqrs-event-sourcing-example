@@ -66,11 +66,8 @@ impl EventService {
         kind: EventKind,
         data: bson::Bson,
     ) {
-        println!("Writing event!");
-
         let event = Event::new(correlation_id, kind, data);
-        let result = self.collection().insert_one(event, None).await;
-        println!("{:?}", result);
+        self.collection().insert_one(event, None).await.unwrap();
     }
 
     pub async fn find_events(

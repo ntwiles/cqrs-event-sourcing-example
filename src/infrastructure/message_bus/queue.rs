@@ -45,7 +45,6 @@ impl MessageQueue {
     }
 
     fn send(&mut self, message: Message) {
-        println!("Sending message: {:?}", message.kind());
         self.queue.push_back(message);
     }
 }
