@@ -37,11 +37,14 @@ impl MessageQueue {
         correlation_id: oid::ObjectId,
         kind: EventKind,
         data: bson::Bson,
-    ) {
+    ) -> Result<(), mongodb::error::Error> {
         self.event_store
             .write_event(correlation_id, kind.clone(), data.clone())
-            .await;
+            .await?;
+
         self.send(Message::new(MessageKind::Event(kind), data));
+
+        Ok(())
     }
 
     fn send(&mut self, message: Message) {

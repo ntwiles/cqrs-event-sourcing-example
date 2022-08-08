@@ -65,9 +65,11 @@ impl EventService {
         correlation_id: oid::ObjectId,
         kind: EventKind,
         data: bson::Bson,
-    ) {
+    ) -> Result<(), mongodb::error::Error> {
         let event = Event::new(correlation_id, kind, data);
-        self.collection().insert_one(event, None).await.unwrap();
+        self.collection().insert_one(event, None).await?;
+
+        Ok(())
     }
 
     pub async fn find_events(

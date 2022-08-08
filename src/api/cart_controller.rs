@@ -93,5 +93,6 @@ async fn raise_cart_created_event(
         .lock()
         .await
         .raise_event(user_id, EventKind::UserCartCreated, event)
-        .await;
+        .await
+        .unwrap()
 }

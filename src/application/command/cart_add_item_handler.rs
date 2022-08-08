@@ -49,5 +49,6 @@ impl MessageHandler for CartAddItemHandler {
             .await
             .raise_event(command.cart_id, EventKind::CartItemAdded, data)
             .await
+            .unwrap();
     }
 }
