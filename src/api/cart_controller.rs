@@ -7,7 +7,10 @@ use std::sync::Arc;
 
 use crate::{
     application::{
-        command::cart_add_item_command::CartAddItemCommand,
+        command::{
+            cart_add_item_command::CartAddItemCommand,
+            cart_remove_item_command::CartRemoveItemCommand,
+        },
         event::user_cart_created_event::UserCartCreatedEvent,
         query::{cart::CartStore, user::UserStore},
     },
@@ -22,6 +25,29 @@ use crate::{
 pub struct CartUpdateRequestBody {
     product_id: oid::ObjectId,
     quantity: u8,
+}
+
+pub async fn read(
+    Extension(cart_store): Extension<Arc<CartStore>>,
+    Extension(user_store): Extension<Arc<UserStore>>,
+) -> Result<Json<Cart>, StatusCode> {
+    // Simulate authenticated user.
+    let user_id = oid::ObjectId::parse_str("62eee62cee48789afbd1354a").unwrap();
+
+    let customer = user_store
+        .get(user_id)
+        .await
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+
+    if let Some(cart_id) = customer.current_cart {
+        cart_store
+            .get(cart_id)
+            .await
+            .map(|c| Json(c))
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+    } else {
+        Err(StatusCode::NOT_FOUND)
+    }
 }
 
 pub async fn update(
@@ -59,10 +85,11 @@ pub async fn update(
     Ok(StatusCode::OK)
 }
 
-pub async fn read(
-    Extension(cart_store): Extension<Arc<CartStore>>,
+pub async fn delete(
+    Json(req): Json<CartUpdateRequestBody>,
+    Extension(messsage_queue): Extension<Arc<Mutex<MessageQueue>>>,
     Extension(user_store): Extension<Arc<UserStore>>,
-) -> Result<Json<Cart>, StatusCode> {
+) -> Result<StatusCode, StatusCode> {
     // Simulate authenticated user.
     let user_id = oid::ObjectId::parse_str("62eee62cee48789afbd1354a").unwrap();
 
@@ -71,15 +98,21 @@ pub async fn read(
         .await
         .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
-    if let Some(cart_id) = customer.current_cart {
-        cart_store
-            .get(cart_id)
-            .await
-            .map(|c| Json(c))
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
-    } else {
-        Err(StatusCode::NOT_FOUND)
-    }
+    let cart_id = customer.current_cart.unwrap();
+
+    let command = CartRemoveItemCommand {
+        cart_id,
+        product_id: req.product_id,
+    };
+
+    let data = bson::to_bson(&command).map_err(|_| StatusCode::BAD_REQUEST)?;
+
+    messsage_queue
+        .lock()
+        .await
+        .send_command(CommandKind::RemoveFromCart, data);
+
+    Ok(StatusCode::OK)
 }
 
 async fn raise_cart_created_event(

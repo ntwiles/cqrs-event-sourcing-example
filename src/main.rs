@@ -12,7 +12,10 @@ use std::{net::SocketAddr, sync::Arc};
 use crate::{
     api::{cart_controller, cart_events_controller, product_controller, user_controller},
     application::{
-        command::cart_add_item_handler::CartAddItemHandler,
+        command::{
+            cart_add_item_handler::CartAddItemHandler,
+            cart_remove_item_handler::CartRemoveItemHandler,
+        },
         event::{
             cart_item_added_handler::CartItemAddedHandler,
             user_cart_created_handler::UserCartCreatedHandler,
@@ -49,6 +52,10 @@ async fn main() {
         bus.clone(),
         product_store.clone(),
     )));
+    registry.add(Box::new(CartRemoveItemHandler::new(
+        bus.clone(),
+        product_store.clone(),
+    )));
 
     // events
     registry.add(Box::new(CartItemAddedHandler::new()));
@@ -64,6 +71,7 @@ async fn main() {
     let app = Router::new()
         .route("/cart", get(cart_controller::read))
         .route("/cart", post(cart_controller::update))
+        .route("/cart/remove", post(cart_controller::delete))
         .route("/cart-events", get(cart_events_controller::read))
         .route("/products", get(product_controller::read))
         .route("/user/:user_id", get(user_controller::read))
